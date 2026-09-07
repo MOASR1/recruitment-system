@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة التحكم الرئيسية - نظام إدارة التوظيف والاعتمادات</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style> body { font-family: 'Tajawal', sans-serif; } </style>
+</head>
+<body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col md:flex-row">
+
+    <!-- القائمة الجانبية -->
+    <aside class="w-full md:w-64 bg-slate-900 text-slate-300 flex-shrink-0 flex flex-col justify-between">
+        <div>
+            <div class="p-6 border-b border-slate-800 flex items-center gap-3">
+                <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-lg">📋</div>
+                <div>
+                    <h1 class="font-bold text-white text-base leading-tight">نظام الاعتمادات</h1>
+                    <p class="text-[11px] text-slate-400">إدارة توظيف الموارد البشرية</p>
+                </div>
+            </div>
+
+            <nav class="p-4 space-y-1 text-sm font-medium">
+                <a href="dashboard.html" class="flex items-center gap-3 px-4 py-3 rounded-xl bg-blue-600 text-white font-semibold transition">
+                    <span>📊</span> لوحة التحكم والإحصائيات
+                </a>
+                <!-- زر جميع طلبات التوظيف المربوط حديثاً -->
+                <a href="all_requests.html" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-800 text-slate-400 hover:text-slate-200 transition">
+                    <span>📑</span> جميع طلبات التوظيف
+                </a>
+                <a href="gemini-code-1788553413343.html" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-800 text-slate-400 hover:text-slate-200 transition">
+                    <span>➕</span> إنشاء طلب جديد
+                </a>
+                <a href="index.html" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-800 text-slate-400 hover:text-slate-200 transition">
+                    <span>👥</span> الصلاحيات والمستخدمين
+                </a>
+                <a href="activity_log.html" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-800 text-slate-400 hover:text-slate-200 transition">
+                    <span>📜</span> سجل العمليات والأمان
+                </a>
+            </nav>
+        </div>
+
+        <div class="p-4 border-t border-slate-800 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center font-bold text-sm border border-blue-500/30">م</div>
+                <div class="text-xs">
+                    <p class="font-bold text-white">محمد راجحي</p>
+                    <p class="text-slate-400 text-[10px]">أخصائي عمليات HR</p>
+                </div>
+            </div>
+            <a href="login_3.html" title="تسجيل الخروج" class="text-slate-400 hover:text-red-400 text-sm">🚪</a>
+        </div>
+    </aside>
+
+    <!-- المحتوى الرئيسي (لا يوجد زر عودة هنا) -->
+    <main class="flex-1 p-6 md:p-8 overflow-y-auto">
+        
+        <header class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+            <div>
+                <h1 class="text-2xl font-bold text-slate-900">مرحباً بك، محمد 👋</h1>
+                <p class="text-xs text-slate-500 mt-1">إليك نظرة عامة على حركة الطلبات وإحصائيات التوظيف لهذا الشهر (سبتمبر 2026)</p>
+            </div>
+            
+            <a href="gemini-code-1788553413343.html" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl text-sm font-semibold shadow-sm flex items-center gap-2 transition">
+                <span>+</span> تقديم طلب تعيين جديد
+            </a>
+        </header>
+
+        <!-- كروت الإحصائيات -->
+        <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
+            <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm flex items-center justify-between">
+                <div>
+                    <span class="text-xs font-semibold text-slate-400 block mb-1">إجمالي طلبات الشهر</span>
+                    <span class="text-2xl font-extrabold text-slate-900">28</span>
+                </div>
+                <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center text-xl">📂</div>
+            </div>
+
+            <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm flex items-center justify-between">
+                <div>
+                    <span class="text-xs font-semibold text-slate-400 block mb-1">بانتظار الموافقات</span>
+                    <span class="text-2xl font-extrabold text-amber-600">6</span>
+                </div>
+                <div class="w-12 h-12 bg-amber-50 text-amber-600 rounded-2xl flex items-center justify-center text-xl">⏳</div>
+            </div>
+
+            <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm flex items-center justify-between">
+                <div>
+                    <span class="text-xs font-semibold text-slate-400 block mb-1">تم اعتمادها</span>
+                    <span class="text-2xl font-extrabold text-emerald-600">19</span>
+                </div>
+                <div class="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center text-xl">✅</div>
+            </div>
+
+            <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm flex items-center justify-between">
+                <div>
+                    <span class="text-xs font-semibold text-slate-400 block mb-1">متوسط الإنجاز</span>
+                    <span class="text-2xl font-extrabold text-indigo-600">2.4 يوم</span>
+                </div>
+                <div class="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center text-xl">⚡</div>
+            </div>
+        </section>
+
+        <!-- جدول الأحدث مع زر توجيه لصفحة الكليات -->
+        <section class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
+            <div class="p-5 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+                <div>
+                    <h2 class="font-bold text-slate-900 text-base">أحدث طلبات التوظيف</h2>
+                    <p class="text-xs text-slate-500 mt-0.5">آخر الطلبات المرفوعة في النظام</p>
+                </div>
+                <a href="all_requests.html" class="text-blue-600 hover:text-blue-700 text-xs font-bold flex items-center gap-1">
+                    <span>عرض جميع الطلبات</span>
+                    <span>←</span>
+                </a>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-right text-xs">
+                    <thead>
+                        <tr class="bg-slate-100/70 text-slate-600 border-b border-slate-200 font-bold">
+                            <th class="p-4">رقم الطلب</th>
+                            <th class="p-4">اسم المرشح</th>
+                            <th class="p-4">المسمى الوظيفي</th>
+                            <th class="p-4">القسم</th>
+                            <th class="p-4">الحالة</th>
+                            <th class="p-4 text-center">الإجراء</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100 text-slate-700">
+                        <tr class="hover:bg-slate-50/80 transition">
+                            <td class="p-4 font-bold text-blue-600">REQ-2026-089</td>
+                            <td class="p-4 font-bold text-slate-900">محمد عبد الله</td>
+                            <td class="p-4">أخصائي عمليات HR</td>
+                            <td class="p-4">الموارد البشرية</td>
+                            <td class="p-4"><span class="bg-amber-100 text-amber-800 px-2.5 py-1 rounded-full font-bold text-[10px]">قيد الاعتماد</span></td>
+                            <td class="p-4 text-center">
+                                <a href="approval.html" class="bg-blue-50 text-blue-600 px-3 py-1.5 rounded-lg font-semibold text-xs border border-blue-200">مراجعة ←</a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+    </main>
+</body>
+</html>

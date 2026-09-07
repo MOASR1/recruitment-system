@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام الاعتمادات - مراجعة وطلب اعتماد</title>
+    <!-- مكتبة Tailwind CSS للتصميم -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+    <style> body { font-family: 'Tajawal', sans-serif; } </style>
+</head>
+<body class="bg-slate-50 text-slate-800 p-6">
+
+    <div class="max-w-4xl mx-auto bg-white rounded-xl shadow-md p-8 border border-slate-100">
+        
+        <!-- عنوان الشاشة والدور الحالي -->
+        <div class="border-b pb-4 mb-6 flex justify-between items-center">
+            <div>
+                <h1 class="text-2xl font-bold text-slate-900">مراجعة طلب تعيين #REQ-2026-089</h1>
+                <p class="text-slate-500 text-sm mt-1">الدور الحالي: <span class="font-bold text-amber-600">نائب المدير العام (الاعتماد النهائي)</span></p>
+            </div>
+            <span class="bg-amber-100 text-amber-800 px-3 py-1 rounded-full text-xs font-semibold">بانتظار موافقتك</span>
+        </div>
+
+        <!-- شريط متابعة حالة الاعتمادات (Audit Trail / Progress Stepper) -->
+        <div class="mb-8 bg-slate-50 p-4 rounded-lg border border-slate-200">
+            <h3 class="text-xs font-bold text-slate-500 mb-3 uppercase tracking-wider">مراحل الاعتماد السابقة:</h3>
+            <div class="grid grid-cols-2 md:grid-cols-6 gap-2 text-center text-xs">
+                <div class="bg-emerald-50 text-emerald-700 p-2 rounded border border-emerald-200">
+                    <p class="font-bold">1. التوظيف</p>
+                    <p class="text-[10px] text-emerald-600">تم الإرسال ✓</p>
+                </div>
+                <div class="bg-emerald-50 text-emerald-700 p-2 rounded border border-emerald-200">
+                    <p class="font-bold">2. المدير المباشر</p>
+                    <p class="text-[10px] text-emerald-600">تمت الموافقة ✓</p>
+                </div>
+                <div class="bg-emerald-50 text-emerald-700 p-2 rounded border border-emerald-200">
+                    <p class="font-bold">3. مدير الشركة</p>
+                    <p class="text-[10px] text-emerald-600">تمت الموافقة ✓</p>
+                </div>
+                <div class="bg-emerald-50 text-emerald-700 p-2 rounded border border-emerald-200">
+                    <p class="font-bold">4. رئيس التشغيل</p>
+                    <p class="text-[10px] text-emerald-600">تمت الموافقة ✓</p>
+                </div>
+                <div class="bg-emerald-50 text-emerald-700 p-2 rounded border border-emerald-200">
+                    <p class="font-bold">5. مدير الموارد</p>
+                    <p class="text-[10px] text-emerald-600">تمت الموافقة ✓</p>
+                </div>
+                <div class="bg-amber-100 text-amber-800 p-2 rounded border border-amber-300 font-bold ring-2 ring-amber-400">
+                    <p>6. نائب المدير العام</p>
+                    <p class="text-[10px] text-amber-700">جاري النظر ⏳</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- تفاصيل البيانات المعروضة للمعتمد -->
+        <div class="bg-slate-50 p-6 rounded-lg border border-slate-200 mb-6 space-y-4">
+            <h2 class="text-md font-bold text-slate-800 border-b pb-2">بيانات طلب التعيين</h2>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                <div>
+                    <span class="text-slate-400 block text-xs">اسم المرشح</span>
+                    <span class="font-semibold text-slate-800">محمد عبد الله</span>
+                </div>
+                <div>
+                    <span class="text-slate-400 block text-xs">المسمى الوظيفي</span>
+                    <span class="font-semibold text-slate-800">أخصائي عمليات HR</span>
+                </div>
+                <div>
+                    <span class="text-slate-400 block text-xs">القسم</span>
+                    <span class="font-semibold text-slate-800">الموارد البشرية</span>
+                </div>
+                <div>
+                    <span class="text-slate-400 block text-xs">الراتب المقترح</span>
+                    <span class="font-semibold text-emerald-600">12,000 SAR</span>
+                </div>
+            </div>
+
+            <!-- قائمة المرفقات المعاينة -->
+            <div class="pt-2">
+                <span class="text-slate-400 block text-xs mb-2">المرفقات المرفقة مع الطلب:</span>
+                <div class="flex flex-wrap gap-2">
+                    <a href="#" class="inline-flex items-center gap-1 text-xs bg-white border border-slate-300 px-3 py-1.5 rounded-md hover:bg-slate-100 text-slate-700">
+                        📄 السيرة_الذاتية.pdf
+                    </a>
+                    <a href="#" class="inline-flex items-center gap-1 text-xs bg-white border border-slate-300 px-3 py-1.5 rounded-md hover:bg-slate-100 text-slate-700">
+                        📄 نموذج_المقابلة.pdf
+                    </a>
+                    <a href="#" class="inline-flex items-center gap-1 text-xs bg-white border border-slate-300 px-3 py-1.5 rounded-md hover:bg-slate-100 text-slate-700">
+                        📄 الشهادات_الأكاديمية.pdf
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- نموذج اتخاذ القرار والتوقيع -->
+        <form id="approvalForm" class="space-y-6 border-t pt-6">
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-2">توصيات وملاحظات المعتمد (اختياري)</label>
+                <textarea rows="3" placeholder="اكتب أسباب القرار أو ملاحظاتك هنا..." class="w-full border border-slate-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"></textarea>
+            </div>
+
+            <!-- خانة التوقيع / الختم الرقمي -->
+            <div class="bg-slate-50 p-4 rounded-lg border border-dashed border-slate-300">
+                <label class="block text-sm font-medium text-slate-700 mb-1">الاعتماد بالتوقيع الرقمي الإلكتروني *</label>
+                <p class="text-xs text-slate-500 mb-3">سيتم تسجيل التوقيع باسم: <span class="font-bold text-slate-700">د. عبد الرحمن (نائب المدير العام)</span> مع الختم الزمني الآلي.</p>
+                <div class="flex items-center gap-2">
+                    <input type="checkbox" id="signConfirm" required class="w-4 h-4 text-blue-600 rounded">
+                    <label for="signConfirm" class="text-xs text-slate-600">أُقر بصفتي المخولة باعتمد هذا الطلب وتأكيد موافقتي الإلكترونية.</label>
+                </div>
+            </div>
+
+            <!-- أزرار اتخاذ القرار -->
+            <div class="flex justify-between items-center border-t pt-6">
+                <button type="button" onclick="handleAction('reject')" class="px-4 py-2 rounded-lg bg-red-50 text-red-600 border border-red-200 hover:bg-red-100 text-sm font-medium">
+                    ✕ رفض الطلب
+                </button>
+                
+                <div class="flex gap-3">
+                    <button type="button" onclick="handleAction('return')" class="px-4 py-2 rounded-lg bg-amber-50 text-amber-700 border border-amber-200 hover:bg-amber-100 text-sm font-medium">
+                        ↩ إعادة للتعديل
+                    </button>
+                    <button type="submit" class="px-6 py-2 rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 text-sm font-semibold shadow-sm">
+                        ✓ اعتماد نهائي وطباعة التقرير
+                    </button>
+                </div>
+            </div>
+        </form>
+
+    </div>
+
+    <script>
+        document.getElementById('approvalForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert('تم تقديم الاعتماد النهائي بنجاح!\nسيتم الآن تحويلك إلى شاشة طباعة الموافقة والمرفقات لمسؤول التوظيف.');
+            // هنا ينتقل للخطوة الأخيرة (الطباعة والتقرير النهائي)
+            alert('الخطوة التالية: توليد نموذج PDF المدمج.');
+        });
+
+        function handleAction(action) {
+            if(action === 'reject') {
+                alert('تم رفض الطلب وإغلاق المعاملة.');
+            } else if(action === 'return') {
+                alert('تمت إعادة الطلب إلى مسؤول التوظيف لاستكمال البيانات.');
+            }
+        }
+    </script>
+
+</body>
+</html>

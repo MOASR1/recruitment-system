@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>سجل العمليات والمراجعة - نظام الاعتمادات</title>
+    <!-- مكتبة Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Tajawal', sans-serif; }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col md:flex-row">
+
+    <!-- القائمة الجانبية (Sidebar) -->
+    <aside class="w-full md:w-64 bg-slate-900 text-slate-300 flex-shrink-0 flex flex-col justify-between">
+        <div>
+            <div class="p-6 border-b border-slate-800 flex items-center gap-3">
+                <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-lg">
+                    📋
+                </div>
+                <div>
+                    <h1 class="font-bold text-white text-base leading-tight">نظام الاعتمادات</h1>
+                    <p class="text-[11px] text-slate-400">إدارة توظيف الموارد البشرية</p>
+                </div>
+            </div>
+
+            <nav class="p-4 space-y-1 text-sm font-medium">
+                <a href="dashboard.html" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-800 text-slate-400 hover:text-slate-200 transition">
+                    <span>📊</span> لوحة التحكم والإحصائيات
+                </a>
+                <a href="dashboard.html" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-800 text-slate-400 hover:text-slate-200 transition">
+                    <span>📑</span> جميع طلبات التوظيف
+                </a>
+                <a href="index.html" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-800 text-slate-400 hover:text-slate-200 transition">
+                    <span>👥</span> الصلاحيات والمستخدمين
+                </a>
+                <a href="activity_log.html" class="flex items-center gap-3 px-4 py-3 rounded-xl bg-blue-600 text-white font-semibold transition">
+                    <span>📜</span> سجل العمليات والأمان
+                </a>
+            </nav>
+        </div>
+
+        <div class="p-4 border-t border-slate-800 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center font-bold text-sm border border-blue-500/30">
+                    م
+                </div>
+                <div class="text-xs">
+                    <p class="font-bold text-white">محمد راجحي</p>
+                    <p class="text-slate-400 text-[10px]">مسؤول النظام / HR</p>
+                </div>
+            </div>
+            <a href="login.html" title="تسجيل الخروج" class="text-slate-400 hover:text-red-400 text-sm">🚪</a>
+        </div>
+    </aside>
+
+    <!-- المحتوى الرئيسي -->
+    <main class="flex-1 p-6 md:p-8 overflow-y-auto">
+        
+        <!-- الترويسة -->
+        <header class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+            <div>
+                <h1 class="text-2xl font-bold text-slate-900 flex items-center gap-2">
+                    <span>📜</span> سجل العمليات والأنشطة (Audit Log)
+                </h1>
+                <p class="text-xs text-slate-500 mt-1">تتبع دقيق لكافة الإجراءات، التعديلات، وعمليات تسجيل الدخول على النظام</p>
+            </div>
+            
+            <button onclick="exportLogs()" class="bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 px-4 py-2 rounded-xl text-xs font-semibold shadow-sm flex items-center gap-2 transition">
+                <span>📥</span> تصدير السجل (CSV)
+            </button>
+        </header>
+
+        <!-- كروت مؤشرات الأنشطة -->
+        <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            <div class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-sm flex items-center justify-between">
+                <div>
+                    <span class="text-xs text-slate-400 font-medium block">إجمالي الأحداث اليوم</span>
+                    <span class="text-xl font-bold text-slate-900">142 إجراء</span>
+                </div>
+                <div class="w-10 h-10 bg-slate-100 text-slate-600 rounded-xl flex items-center justify-center text-lg">⚡</div>
+            </div>
+
+            <div class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-sm flex items-center justify-between">
+                <div>
+                    <span class="text-xs text-slate-400 font-medium block">عمليات الاعتماد والرفض</span>
+                    <span class="text-xl font-bold text-emerald-600">38 عملية</span>
+                </div>
+                <div class="w-10 h-10 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center text-lg">✅</div>
+            </div>
+
+            <div class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-sm flex items-center justify-between">
+                <div>
+                    <span class="text-xs text-slate-400 font-medium block">تعديل وصلاحيات البيانات</span>
+                    <span class="text-xl font-bold text-blue-600">15 تغيير</span>
+                </div>
+                <div class="w-10 h-10 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center text-lg">✏️</div>
+            </div>
+
+            <div class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-sm flex items-center justify-between">
+                <div>
+                    <span class="text-xs text-slate-400 font-medium block">محاولات دخول فاشلة</span>
+                    <span class="text-xl font-bold text-red-600">2 محاولة</span>
+                </div>
+                <div class="w-10 h-10 bg-red-50 text-red-600 rounded-xl flex items-center justify-center text-lg">⚠️</div>
+            </div>
+        </section>
+
+        <!-- شريط البحث والتصنيفات (Advanced Filters) -->
+        <section class="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-5 mb-6">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                
+                <!-- البحث بالكلمات المفتاحية -->
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-600 mb-1">بحث في السجل</label>
+                    <div class="relative">
+                        <input type="text" id="searchInput" onkeyup="applyFilters()" placeholder="اسم المستخدم، رقم الطلب، التفاصيل..." class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-blue-500 focus:bg-white focus:outline-none transition">
+                    </div>
+                </div>
+
+                <!-- تصفية حسب نوع الإجراء -->
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-600 mb-1">نوع الإجراء</label>
+                    <select id="actionFilter" onchange="applyFilters()" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs font-medium text-slate-700 focus:ring-2 focus:ring-blue-500 focus:bg-white focus:outline-none transition">
+                        <option value="all">جميع الإجراءات</option>
+                        <option value="approval">اعتماد / موافقة</option>
+                        <option value="rejection">رفض طلب</option>
+                        <option value="create">إنشاء جديد</option>
+                        <option value="update">تعديل بيانات</option>
+                        <option value="auth">تسجيل دخول / خروج</option>
+                    </select>
+                </div>
+
+                <!-- تصفية حسب المستخدم -->
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-600 mb-1">المستخدم</label>
+                    <select id="userFilter" onchange="applyFilters()" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs font-medium text-slate-700 focus:ring-2 focus:ring-blue-500 focus:bg-white focus:outline-none transition">
+                        <option value="all">جميع المستخدمين</option>
+                        <option value="محمد راجحي">محمد راجحي (HR)</option>
+                        <option value="د. خالد العمري">د. خالد العمري (مدير)</option>
+                        <option value="سارة العتيبي">سارة العتيبي (IT)</option>
+                        <option value="النظام">النظام التلقائي (System)</option>
+                    </select>
+                </div>
+
+                <!-- تصفية بالمدى الزمني -->
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-600 mb-1">التاريخ</label>
+                    <input type="date" id="dateFilter" onchange="applyFilters()" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs font-medium text-slate-700 focus:ring-2 focus:ring-blue-500 focus:bg-white focus:outline-none transition">
+                </div>
+
+            </div>
+        </section>
+
+        <!-- جدول العمليات المطور -->
+        <section class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-right text-xs">
+                    <thead>
+                        <tr class="bg-slate-100/80 text-slate-600 border-b border-slate-200 font-bold">
+                            <th class="p-4">تاريخ ووقت الإجراء</th>
+                            <th class="p-4">المستخدم</th>
+                            <th class="p-4">نوع الإجراء</th>
+                            <th class="p-4">الهدف / الموضوع</th>
+                            <th class="p-4">التفاصيل والوصف</th>
+                            <th class="p-4">عنوان IP / الجهاز</th>
+                            <th class="p-4 text-center">التفاصيل</th>
+                        </tr>
+                    </thead>
+                    <tbody id="logsTable" class="divide-y divide-slate-100 text-slate-700">
+                        
+                        <!-- سجل 1: اعتماد -->
+                        <tr class="hover:bg-slate-50 transition log-row" data-action="approval" data-user="د. خالد العمري">
+                            <td class="p-4 text-slate-500 font-mono text-[11px]">2026-09-06 10:42:15</td>
+                            <td class="p-4 font-bold text-slate-900">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-6 h-6 rounded-full bg-amber-100 text-amber-800 flex items-center justify-center text-[10px] font-bold">خـ</div>
+                                    د. خالد العمري
+                                </div>
+                            </td>
+                            <td class="p-4">
+                                <span class="bg-emerald-100 text-emerald-800 border border-emerald-200 px-2.5 py-1 rounded-full font-bold text-[10px] inline-flex items-center gap-1">
+                                    ✓ اعتماد طلب
+                                </span>
+                            </td>
+                            <td class="p-4 font-bold text-blue-600">REQ-2026-089</td>
+                            <td class="p-4">تم اعتماد العرض الوظيفي للمرشح (محمد عبد الله) - المرحلة 6</td>
+                            <td class="p-4 text-slate-400 font-mono text-[11px]">192.168.1.45</td>
+                            <td class="p-4 text-center">
+                                <button onclick="showDetails('REQ-2026-089', 'اعتماد طلب توظيف', 'تم منح الموافقة النهائية من قبل نائب المدير العام')" class="text-blue-600 hover:underline font-semibold">عرض</button>
+                            </td>
+                        </tr>
+
+                        <!-- سجل 2: إنشاء -->
+                        <tr class="hover:bg-slate-50 transition log-row" data-action="create" data-user="محمد راجحي">
+                            <td class="p-4 text-slate-500 font-mono text-[11px]">2026-09-06 09:15:00</td>
+                            <td class="p-4 font-bold text-slate-900">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-6 h-6 rounded-full bg-blue-100 text-blue-800 flex items-center justify-center text-[10px] font-bold">مـ</div>
+                                    محمد راجحي
+                                </div>
+                            </td>
+                            <td class="p-4">
+                                <span class="bg-purple-100 text-purple-800 border border-purple-200 px-2.5 py-1 rounded-full font-bold text-[10px] inline-flex items-center gap-1">
+                                    ➕ إنشاء طلب
+                                </span>
+                            </td>
+                            <td class="p-4 font-bold text-blue-600">REQ-2026-091</td>
+                            <td class="p-4">إضافة طلب توظيف جديد بمسمى (محاسب رواتب أول)</td>
+                            <td class="p-4 text-slate-400 font-mono text-[11px]">10.0.4.12</td>
+                            <td class="p-4 text-center">
+                                <button onclick="showDetails('REQ-2026-091', 'إنشاء طلب توظيف', 'تم إدخال كافة البيانات ورُفع للمراجعة المالية')" class="text-blue-600 hover:underline font-semibold">عرض</button>
+                            </td>
+                        </tr>
+
+                        <!-- سجل 3: تعديل -->
+                        <tr class="hover:bg-slate-50 transition log-row" data-action="update" data-user="سارة العتيبي">
+                            <td class="p-4 text-slate-500 font-mono text-[11px]">2026-09-05 16:20:00</td>
+                            <td class="p-4 font-bold text-slate-900">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-6 h-6 rounded-full bg-purple-100 text-purple-800 flex items-center justify-center text-[10px] font-bold">سـ</div>
+                                    سارة العتيبي
+                                </div>
+                            </td>
+                            <td class="p-4">
+                                <span class="bg-blue-100 text-blue-800 border border-blue-200 px-2.5 py-1 rounded-full font-bold text-[10px] inline-flex items-center gap-1">
+                                    ✏️ تعديل صلاحية
+                                </span>
+                            </td>
+                            <td class="p-4 font-bold text-slate-700">مستخدم #104</td>
+                            <td class="p-4">تحديث مستوى الوصول للمستخدم (فهد السليمان) إلى مدير قسم</td>
+                            <td class="p-4 text-slate-400 font-mono text-[11px]">192.168.1.88</td>
+                            <td class="p-4 text-center">
+                                <button onclick="showDetails('مستخدم #104', 'تعديل صلاحيات', 'تم تعديل الأدوار من موهوب إلى مدير قسم بواسطة المسؤول')" class="text-blue-600 hover:underline font-semibold">عرض</button>
+                            </td>
+                        </tr>
+
+                        <!-- سجل 4: رفض -->
+                        <tr class="hover:bg-slate-50 transition log-row" data-action="rejection" data-user="د. خالد العمري">
+                            <td class="p-4 text-slate-500 font-mono text-[11px]">2026-09-05 14:10:00</td>
+                            <td class="p-4 font-bold text-slate-900">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-6 h-6 rounded-full bg-amber-100 text-amber-800 flex items-center justify-center text-[10px] font-bold">خـ</div>
+                                    د. خالد العمري
+                                </div>
+                            </td>
+                            <td class="p-4">
+                                <span class="bg-red-100 text-red-800 border border-red-200 px-2.5 py-1 rounded-full font-bold text-[10px] inline-flex items-center gap-1">
+                                    ✕ رفض طلب
+                                </span>
+                            </td>
+                            <td class="p-4 font-bold text-blue-600">REQ-2026-078</td>
+                            <td class="p-4">رفض طلب التعيين لعدم مطابقة سنوات الخبرة للمعيار المطلوب</td>
+                            <td class="p-4 text-slate-400 font-mono text-[11px]">192.168.1.45</td>
+                            <td class="p-4 text-center">
+                                <button onclick="showDetails('REQ-2026-078', 'رفض طلب توظيف', 'السبب: عدم استيفاء الشروط المحددة في الوصف الوظيفي')" class="text-blue-600 hover:underline font-semibold">عرض</button>
+                            </td>
+                        </tr>
+
+                        <!-- سجل 5: دخول -->
+                        <tr class="hover:bg-slate-50 transition log-row" data-action="auth" data-user="محمد راجحي">
+                            <td class="p-4 text-slate-500 font-mono text-[11px]">2026-09-05 08:00:00</td>
+                            <td class="p-4 font-bold text-slate-900">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-6 h-6 rounded-full bg-blue-100 text-blue-800 flex items-center justify-center text-[10px] font-bold">مـ</div>
+                                    محمد راجحي
+                                </div>
+                            </td>
+                            <td class="p-4">
+                                <span class="bg-slate-100 text-slate-800 border border-slate-200 px-2.5 py-1 rounded-full font-bold text-[10px] inline-flex items-center gap-1">
+                                    🔑 تسجيل دخول
+                                </span>
+                            </td>
+                            <td class="p-4 font-bold text-slate-700">جلسة النظام</td>
+                            <td class="p-4">تسجيل دخول ناجح عبر المصادقة الثنائية</td>
+                            <td class="p-4 text-slate-400 font-mono text-[11px]">10.0.4.12</td>
+                            <td class="p-4 text-center">
+                                <button onclick="showDetails('جلسة النظام', 'تسجيل دخول', 'دخول ناجح متوافق مع متطلبات الأمان')" class="text-blue-600 hover:underline font-semibold">عرض</button>
+                            </td>
+                        </tr>
+
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="p-4 border-t border-slate-100 flex justify-between items-center text-xs text-slate-500 bg-slate-50/50">
+                <span>عرض الأحداث المصفاة</span>
+                <div class="flex gap-1">
+                    <button class="px-3 py-1 border border-slate-300 rounded-lg bg-white text-slate-600 hover:bg-slate-100">السابق</button>
+                    <button class="px-3 py-1 border border-blue-600 rounded-lg bg-blue-600 text-white font-bold">1</button>
+                    <button class="px-3 py-1 border border-slate-300 rounded-lg bg-white text-slate-600 hover:bg-slate-100">التالي</button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- البرمجة التفاعلية للفلاتر والتصفية -->
+    <script>
+        function applyFilters() {
+            const searchValue = document.getElementById('searchInput').value.toLowerCase();
+            const actionValue = document.getElementById('actionFilter').value;
+            const userValue = document.getElementById('userFilter').value;
+            
+            const rows = document.querySelectorAll('.log-row');
+
+            rows.forEach(row => {
+                const text = row.innerText.toLowerCase();
+                const rowAction = row.dataset.action;
+                const rowUser = row.dataset.user;
+
+                const matchesSearch = text.includes(searchValue);
+                const matchesAction = (actionValue === 'all' || rowAction === actionValue);
+                const matchesUser = (userValue === 'all' || rowUser === userValue);
+
+                if (matchesSearch && matchesAction && matchesUser) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+
+        function showDetails(target, title, detail) {
+            alert(`[تفاصيل العملية]\nالهدف: ${target}\nنوع العمل: ${title}\nالوصف التفصيلي: ${detail}`);
+        }
+
+        function exportLogs() {
+            alert('جاري تجهيز سجل العمليات المصفى بتنسيق CSV للتنزيل...');
+        }
+    </script>
+
+</body>
+</html>

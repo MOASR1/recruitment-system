@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نموذج اعتماد تعيين - REQ-2026-089</title>
+    <!-- مكتبة Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+    <style> 
+        body { font-family: 'Tajawal', sans-serif; }
+        /* إخفاء الأزرار عند الطباعة الفعلية */
+        @media print {
+            .no-print { display: none !important; }
+            body { background-color: #fff; padding: 0; }
+            .print-container { border: none !important; shadow: none !important; }
+        }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-800 p-4 md:p-8">
+
+    <!-- شريط التحكم العلوي (يختفي عند الطباعة) -->
+    <div class="max-w-4xl mx-auto mb-4 flex justify-between items-center no-print">
+        <a href="approval.html" class="text-sm text-slate-600 hover:text-slate-900 flex items-center gap-1">
+            → العودة لشاشة الاعتمادات
+        </a>
+        <div class="flex gap-2">
+            <button onclick="window.print()" class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-semibold shadow-sm flex items-center gap-2">
+                🖨️ طباعة النموذج (PDF)
+            </button>
+        </div>
+    </div>
+
+    <!-- وثيقة الاعتماد الرسمية -->
+    <div class="max-w-4xl mx-auto bg-white rounded-xl shadow-lg p-8 border border-slate-200 print-container">
+        
+        <!-- الترويسة الرسمية (Header) -->
+        <div class="flex justify-between items-center border-b-2 border-slate-800 pb-4 mb-6">
+            <div>
+                <h1 class="text-2xl font-bold text-slate-900">نموذج اعتماد طلب تعيين</h1>
+                <p class="text-xs text-slate-500 mt-1">رقم الطلب: <span class="font-bold text-slate-700">REQ-2026-089</span> | التاريخ: <span class="font-bold text-slate-700">04 سبتمبر 2026</span></p>
+            </div>
+            <div class="text-left">
+                <span class="inline-block bg-emerald-100 text-emerald-800 text-xs font-bold px-3 py-1 rounded-full border border-emerald-300">
+                    ✓ معتمد إلكترونياً بالكامل
+                </span>
+            </div>
+        </div>
+
+        <!-- 1. بيانات المرشح والوظيفة -->
+        <div class="mb-6">
+            <h2 class="text-sm font-bold text-slate-900 uppercase bg-slate-100 p-2 rounded mb-3 border-r-4 border-blue-600">أولاً: بيانات الطلب والمرشح</h2>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm px-2">
+                <div>
+                    <span class="text-xs text-slate-400 block">اسم المرشح</span>
+                    <span class="font-bold text-slate-800">محمد عبد الله</span>
+                </div>
+                <div>
+                    <span class="text-xs text-slate-400 block">المسمى الوظيفي</span>
+                    <span class="font-semibold text-slate-800">أخصائي عمليات HR</span>
+                </div>
+                <div>
+                    <span class="text-xs text-slate-400 block">القسم / الإدارة</span>
+                    <span class="font-semibold text-slate-800">الموارد البشرية</span>
+                </div>
+                <div>
+                    <span class="text-xs text-slate-400 block">الراتب الشهري المعتمد</span>
+                    <span class="font-bold text-emerald-700">12,000 SAR</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. سجل التواقيع والاعتمادات الإلكترونية (Audit Trail Table) -->
+        <div class="mb-6">
+            <h2 class="text-sm font-bold text-slate-900 uppercase bg-slate-100 p-2 rounded mb-3 border-r-4 border-blue-600">ثانياً: سجل التواقيع والاعتمادات الإلكترونية</h2>
+            <div class="overflow-x-auto">
+                <table class="w-full text-xs text-right border-collapse">
+                    <thead>
+                        <tr class="bg-slate-50 border-b text-slate-600">
+                            <th class="p-2 border">#</th>
+                            <th class="p-2 border">الدور الإداري</th>
+                            <th class="p-2 border">اسم المعتمد</th>
+                            <th class="p-2 border">القرار</th>
+                            <th class="p-2 border">التاريخ والوقت</th>
+                            <th class="p-2 border">الختم والتوقيع الرقمي</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y text-slate-700">
+                        <tr>
+                            <td class="p-2 border">1</td>
+                            <td class="p-2 border font-semibold">مسؤول التوظيف</td>
+                            <td class="p-2 border">أحمد علي</td>
+                            <td class="p-2 border text-emerald-600 font-bold">إنشاء وإرسال</td>
+                            <td class="p-2 border text-slate-400">2026-09-01 09:30 AM</td>
+                            <td class="p-2 border text-slate-400">VERIFIED-ID#8831</td>
+                        </tr>
+                        <tr>
+                            <td class="p-2 border">2</td>
+                            <td class="p-2 border font-semibold">المدير المباشر</td>
+                            <td class="p-2 border">سعد الخالد</td>
+                            <td class="p-2 border text-emerald-600 font-bold">موافقة</td>
+                            <td class="p-2 border text-slate-400">2026-09-01 11:15 AM</td>
+                            <td class="p-2 border text-slate-400">VERIFIED-ID#9012</td>
+                        </tr>
+                        <tr>
+                            <td class="p-2 border">3</td>
+                            <td class="p-2 border font-semibold">مدير الشركة</td>
+                            <td class="p-2 border">م. خالد العمري</td>
+                            <td class="p-2 border text-emerald-600 font-bold">موافقة</td>
+                            <td class="p-2 border text-slate-400">2026-09-02 02:20 PM</td>
+                            <td class="p-2 border text-slate-400">VERIFIED-ID#9104</td>
+                        </tr>
+                        <tr>
+                            <td class="p-2 border">4</td>
+                            <td class="p-2 border font-semibold">رئيس التشغيل (COO)</td>
+                            <td class="p-2 border">عمر الفاروق</td>
+                            <td class="p-2 border text-emerald-600 font-bold">موافقة</td>
+                            <td class="p-2 border text-slate-400">2026-09-03 10:00 AM</td>
+                            <td class="p-2 border text-slate-400">VERIFIED-ID#9221</td>
+                        </tr>
+                        <tr>
+                            <td class="p-2 border">5</td>
+                            <td class="p-2 border font-semibold">مدير الموارد البشرية</td>
+                            <td class="p-2 border">فهد السليمان</td>
+                            <td class="p-2 border text-emerald-600 font-bold">موافقة</td>
+                            <td class="p-2 border text-slate-400">2026-09-03 04:45 PM</td>
+                            <td class="p-2 border text-slate-400">VERIFIED-ID#9305</td>
+                        </tr>
+                        <tr class="bg-emerald-50/50">
+                            <td class="p-2 border">6</td>
+                            <td class="p-2 border font-semibold text-emerald-900">نائب المدير العام</td>
+                            <td class="p-2 border font-bold">د. عبد الرحمن</td>
+                            <td class="p-2 border text-emerald-700 font-bold">اعتماد نهائي ✓</td>
+                            <td class="p-2 border text-slate-400">2026-09-04 11:00 AM</td>
+                            <td class="p-2 border text-emerald-800 font-bold">FINAL-STAMP#9999</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 3. قائمة المرفقات المعالجة -->
+        <div class="mb-6">
+            <h2 class="text-sm font-bold text-slate-900 uppercase bg-slate-100 p-2 rounded mb-3 border-r-4 border-blue-600">ثالثاً: المرفقات المعتمدة والمرتبطة</h2>
+            <ul class="text-xs space-y-1.5 list-disc list-inside text-slate-600 px-2">
+                <li>السيرة الذاتية (Resume_Candidate.pdf) - <span class="text-slate-400">مرفق</span></li>
+                <li>نموذج تقييم المقابلة الشخصية (Interview_Evaluation.pdf) - <span class="text-slate-400">مرفق</span></li>
+                <li>الشهادات والمؤهلات الأكاديمية (Degrees_Certificates.pdf) - <span class="text-slate-400">مرفق</span></li>
+            </ul>
+        </div>
+
+        <!-- أسفل الوثيقة -->
+        <div class="border-t pt-4 mt-8 flex justify-between items-center text-[10px] text-slate-400">
+            <p>هذه الوثيقة مستخرجة آلياً من نظام الاعتمادات ولا تحتاج لختم يدوي.</p>
+            <p>الصفحة 1 من 1</p>
+        </div>
+
+    </div>
+
+</body>
+</html>
