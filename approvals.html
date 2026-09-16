@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>سلسلة الاعتمادات والموافقات - نظام الاعتمادات</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="app.js"></script>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col font-sans">
+
+    <!-- الشريط العلوي -->
+    <header class="bg-slate-800 border-b border-slate-700 px-6 py-4 flex justify-between items-center">
+        <div class="flex items-center space-x-4 space-x-reverse">
+            <i class="fas me-3 fa-check-double text-blue-500 text-2xl"></i>
+            <div>
+                <h1 class="text-xl font-bold">سلسلة الاعتمادات والموافقات</h1>
+                <p class="text-xs text-slate-400">اتخاذ القرارات على الطلبات وضبط مسارات الموافقات</p>
+            </div>
+        </div>
+        <div class="flex items-center space-x-3 space-x-reverse">
+            <a href="dashboard.html" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-sm transition">
+                <i class="fas fa-arrow-right ml-1"></i> العودة للوحة التحكم
+            </a>
+            <button onclick="App.logout()" class="px-4 py-2 bg-red-600/20 text-red-400 hover:bg-red-600/30 rounded-lg text-sm transition">
+                خروج <i class="fas fa-sign-out-alt mr-1"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- المحتوى الرئيسي -->
+    <main class="flex-1 p-6 max-w-7xl mx-auto w-full">
+
+        <!-- التبويبات الرئيسية -->
+        <div class="flex border-b border-slate-700 mb-6">
+            <button id="tabPendingBtn" onclick="switchTab('pending')" class="px-6 py-3 border-b-2 border-blue-500 text-blue-400 font-semibold text-sm flex items-center">
+                <i class="fas fa-clock ml-2"></i> طلبات بانتظار موافقتك
+                <span id="pendingBadge" class="mr-2 px-2 py-0.5 bg-amber-500/20 text-amber-400 rounded-full text-xs hidden">0</span>
+            </button>
+            <button id="tabChainsBtn" onclick="switchTab('chains')" class="px-6 py-3 border-b-2 border-transparent text-slate-400 hover:text-slate-200 font-semibold text-sm flex items-center">
+                <i class="fas fa-project-diagram ml-2"></i> إعداد سلاسل الاعتماد
+            </button>
+        </div>
+
+        <!-- مؤشر التحميل -->
+        <div id="loadingIndicator" class="text-center py-12">
+            <i class="fas fa-circle-notch fa-spin text-4xl text-blue-500 mb-3"></i>
+            <p class="text-slate-400 text-sm">جاري التزامن مع Google Sheets...</p>
+        </div>
+
+        <!-- التبويب الأول: الطلبات المعلقة للاعتماد -->
+        <section id="pendingSection" class="space-y-4 hidden">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-lg font-bold">الطلبات الواردة التي تتطلب اتخاذ قرار</h2>
+                <button onclick="loadApprovalsData()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-lg text-sm flex items-center">
+                    <i class="fas fa-sync-alt ml-2 text-slate-400" id="refreshIcon"></i> تحديث
+                </button>
+            </div>
+
+            <div id="pendingCardsContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- يتم تعبئة بطاقات الطلبات ديناميكياً -->
+            </div>
+        </section>
+
+        <!-- التبويب الثاني: إعداد سلاسل الاعتماد للقطاعات -->
+        <section id="chainsSection" class="space-y-6 hidden">
+            <div class="bg-slate-800 border border-slate-700 rounded-xl p-5">
+                <h3 class="text-md font-bold text-white mb-2">مسار سلسلة الموافقات الحالي حسب القسم</h3>
+                <p class="text-xs text-slate-400 mb-4">يمكنك تحديد مصففي مسار الاعتماد المتسلسل للطلبات الصادرة من كل قسم</p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                    <div>
+                        <label class="block text-xs text-slate-400 mb-1">اختر القسم</label>
+                        <select id="chainDeptSelect" onchange="renderDepartmentChain()" class="w-full p-2.5 bg-slate-900 border border-slate-700 rounded-lg text-sm">
+                            <!-- الأقسام -->
+                        </select>
+                    </div>
+                </div>
+
+                <div id="chainStepsDisplay" class="bg-slate-900/60 border border-slate-700 rounded-lg p-4 space-y-3">
+                    <!-- يتم عرض مراحل الاعتماد -->
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- نافذة اتخاذ القرار (Modal) -->
+    <div id="actionModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50 hidden">
+        <div class="bg-slate-800 border border-slate-700 rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden">
+            <div class="p-5 border-b border-slate-700 flex justify-between items-center">
+                <h3 id="actionModalTitle" class="text-lg font-bold text-white">اتخاذ قرار بشأن الطلب</h3>
+                <button onclick="closeActionModal()" class="text-slate-400 hover:text-white"><i class="fas fa-times text-xl"></i></button>
+            </div>
+
+            <form id="actionForm" onsubmit="handleApprovalSubmit(event)" class="p-6 space-y-4">
+                <input type="hidden" id="actionRequestId">
+                <input type="hidden" id="actionType">
+
+                <div id="requestSummary" class="p-3 bg-slate-900/70 border border-slate-700/60 rounded-lg text-xs space-y-1">
+                    <!-- تفاصيل سريعة عن الطلب -->
+                </div>
+
+                <div>
+                    <label class="block text-xs text-slate-400 mb-1">ملاحظات القرار / أسباب الرفض *</label>
+                    <textarea id="actionNotes" rows="3" required placeholder="اكتب ملاحظاتك وتوجيهاتك بشأن الطلب..." class="w-full p-2.5 bg-slate-900 border border-slate-700 rounded-lg focus:border-blue-500 text-sm text-slate-200"></textarea>
+                </div>
+
+                <div class="pt-4 border-t border-slate-700 flex justify-end space-x-3 space-x-reverse">
+                    <button type="button" onclick="closeActionModal()" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-sm">إلغاء</button>
+                    <button type="submit" id="confirmActionBtn" class="px-6 py-2 rounded-lg font-medium text-sm transition">
+                        تأكيد القرار
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- المنطق البرمجي -->
+    <script>
+        let allRequests = [];
+        let allDepartments = [];
+        let currentUser = null;
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            currentUser = App.getCurrentUser();
+            if (!currentUser) {
+                window.location.href = 'index.html';
+                return;
+            }
+
+            await loadApprovalsData();
+        });
+
+        // 1. جلب البيانات من قوقل شيت
+        async function loadApprovalsData() {
+            showLoading(true);
+            try {
+                const [requests, departments] = await Promise.all([
+                    App.getRequests(),
+                    App.getDepartments()
+                ]);
+
+                allRequests = requests;
+                allDepartments = departments;
+
+                populateDepartmentSelect(departments);
+                renderPendingRequests();
+                renderDepartmentChain();
+            } catch (error) {
+                console.error("خطأ أثناء تحميل بيانات الاعتمادات:", error);
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // 2. التنقل بين التبويبات
+        function switchTab(tab) {
+            const isPending = tab === 'pending';
+            document.getElementById('pendingSection').classList.toggle('hidden', !isPending);
+            document.getElementById('chainsSection').classList.toggle('hidden', isPending);
+
+            document.getElementById('tabPendingBtn').className = isPending 
+                ? "px-6 py-3 border-b-2 border-blue-500 text-blue-400 font-semibold text-sm flex items-center"
+                : "px-6 py-3 border-b-2 border-transparent text-slate-400 hover:text-slate-200 font-semibold text-sm flex items-center";
+
+            document.getElementById('tabChainsBtn').className = !isPending 
+                ? "px-6 py-3 border-b-2 border-blue-500 text-blue-400 font-semibold text-sm flex items-center"
+                : "px-6 py-3 border-b-2 border-transparent text-slate-400 hover:text-slate-200 font-semibold text-sm flex items-center";
+        }
+
+        // 3. عرض الطلبات التي تتطلب موافقة
+        function renderPendingRequests() {
+            const container = document.getElementById('pendingCardsContainer');
+            // فلترة الطلبات قيد الانتظار
+            const pendingList = allRequests.filter(r => r.status === 'قيد الانتظار');
+
+            const badge = document.getElementById('pendingBadge');
+            if (pendingList.length > 0) {
+                badge.innerText = pendingList.length;
+                badge.classList.remove('hidden');
+            } else {
+                badge.classList.add('hidden');
+            }
+
+            if (pendingList.length === 0) {
+                container.innerHTML = `
+                    <div class="col-span-2 bg-slate-800 border border-slate-700 rounded-xl p-8 text-center text-slate-400">
+                        <i class="fas fa-check-circle text-4xl text-emerald-500 mb-3"></i>
+                        <p>لا يوجد طلبات توظيف تتطلب موافقتك حالياً</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = pendingList.map(r => `
+                <div class="bg-slate-800 border border-slate-700 rounded-xl p-5 shadow-md flex flex-col justify-between space-y-4">
+                    <div>
+                        <div class="flex justify-between items-start mb-2">
+                            <span class="text-xs font-bold text-blue-400 bg-blue-500/10 px-2.5 py-1 rounded-full border border-blue-500/20">
+                                ${r.id}
+                            </span>
+                            <span class="text-xs text-slate-400"><i class="fas fa-clock ml-1"></i>${r.createdAt ? new Date(r.createdAt).toLocaleDateString('ar-SA') : 'جديد'}</span>
+                        </div>
+                        <h4 class="text-lg font-bold text-white mb-1">${r.title || r.jobTitle}</h4>
+                        <div class="text-xs text-slate-300 space-y-1">
+                            <p><i class="fas fa-building text-slate-400 ml-1"></i> القسم: <strong>${r.dept || 'عام'}</strong></p>
+                            <p><i class="fas fa-user-tag text-slate-400 ml-1"></i> المرشح: <strong>${r.candidate || 'غير محدد'}</strong></p>
+                            <p><i class="fas fa-coins text-slate-400 ml-1"></i> الراتب المقترح: <strong>${r.salary ? Number(r.salary).toLocaleString() + ' SAR' : '-'}</strong></p>
+                            ${r.notes ? `<p class="text-slate-400 bg-slate-900/50 p-2 rounded mt-2 text-xs border border-slate-700/50">${r.notes}</p>` : ''}
+                        </div>
+                    </div>
+
+                    <div class="flex items-center space-x-2 space-x-reverse pt-3 border-t border-slate-700">
+                        <button onclick="openActionModal('${r.id}', 'APPROVE')" class="flex-1 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-xs font-bold transition flex items-center justify-center">
+                            <i class="fas fa-check-circle ml-1"></i> موافقة واعتماد
+                        </button>
+                        <button onclick="openActionModal('${r.id}', 'REJECT')" class="flex-1 py-2 bg-red-600/20 text-red-400 hover:bg-red-600/40 rounded-lg text-xs font-bold transition flex items-center justify-center">
+                            <i class="fas fa-times-circle ml-1"></i> رفض الطلب
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // 4. فتح نافذة اتخاذ القرار
+        function openActionModal(reqId, type) {
+            const req = allRequests.find(r => String(r.id) === String(reqId));
+            if (!req) return;
+
+            document.getElementById('actionRequestId').value = req.id;
+            document.getElementById('actionType').value = type;
+            document.getElementById('actionNotes').value = '';
+
+            const summary = document.getElementById('requestSummary');
+            summary.innerHTML = `
+                <div><strong>رقم الطلب:</strong> ${req.id}</div>
+                <div><strong>المسمى:</strong> ${req.title || req.jobTitle}</div>
+                <div><strong>الجهة:</strong> ${req.dept || '-'}</div>
+            `;
+
+            const btn = document.getElementById('confirmActionBtn');
+            const title = document.getElementById('actionModalTitle');
+
+            if (type === 'APPROVE') {
+                title.innerText = 'اعتماد وتأييد الطلب';
+                btn.className = 'px-6 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg font-medium text-sm';
+                btn.innerHTML = `<i class="fas fa-check ml-1"></i> اعتماد`;
+            } else {
+                title.innerText = 'رفض الطلب';
+                btn.className = 'px-6 py-2 bg-red-600 hover:bg-red-500 text-white rounded-lg font-medium text-sm';
+                btn.innerHTML = `<i class="fas fa-ban ml-1"></i> تأكيد الرفض`;
+            }
+
+            document.getElementById('actionModal').classList.remove('hidden');
+        }
+
+        function closeActionModal() {
+            document.getElementById('actionModal').classList.add('hidden');
+        }
+
+        // 5. حفظ قرار الاعتماد / الرفض
+        async function handleApprovalSubmit(e) {
+            e.preventDefault();
+            const btn = document.getElementById('confirmActionBtn');
+            btn.disabled = true;
+
+            const reqId = document.getElementById('actionRequestId').value;
+            const actionType = document.getElementById('actionType').value;
+            const notes = document.getElementById('actionNotes').value.trim();
+
+            const reqIndex = allRequests.findIndex(r => String(r.id) === String(reqId));
+            if (reqIndex !== -1) {
+                const newStatus = (actionType === 'APPROVE') ? 'مكتمل' : 'مرفوض';
+                allRequests[reqIndex].status = newStatus;
+                allRequests[reqIndex].approvalNotes = notes;
+                allRequests[reqIndex].actionBy = currentUser.name || currentUser.email;
+
+                const success = await App.saveRequests(allRequests);
+                if (success) {
+                    await App.appendLog(
+                        'سلسلة الاعتمادات', 
+                        `قام (${currentUser.name}) بـ ${actionType === 'APPROVE' ? 'اعتماد' : 'رفض'} الطلب رقم (${reqId})`
+                    );
+                    renderPendingRequests();
+                    closeActionModal();
+                } else {
+                    alert('حدث خطأ أثناء تحديث حالة الطلب في قوقل شيت');
+                }
+            }
+
+            btn.disabled = false;
+        }
+
+        // 6. عرض خيارات الأقسام وإعداد السلسلة
+        function populateDepartmentSelect(depts) {
+            const select = document.getElementById('chainDeptSelect');
+            select.innerHTML = depts.map(d => `<option value="${d.name}">${d.name}</option>`).join('');
+        }
+
+        function renderDepartmentChain() {
+            const selectedDept = document.getElementById('chainDeptSelect').value;
+            const container = document.getElementById('chainStepsDisplay');
+
+            container.innerHTML = `
+                <div class="flex items-center space-x-3 space-x-reverse text-sm py-2">
+                    <div class="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-xs">1</div>
+                    <div class="flex-1 bg-slate-800 p-3 rounded-lg border border-slate-700">
+                        <div class="font-semibold text-white">مدير قسم ${selectedDept || ''}</div>
+                        <div class="text-xs text-slate-400">الموافقة المبدئية والتحقق من الميزانية المتاحة</div>
+                    </div>
+                </div>
+                <div class="text-center text-slate-500 text-xs py-1"><i class="fas fa-arrow-down"></i></div>
+                <div class="flex items-center space-x-3 space-x-reverse text-sm py-2">
+                    <div class="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-xs">2</div>
+                    <div class="flex-1 bg-slate-800 p-3 rounded-lg border border-slate-700">
+                        <div class="font-semibold text-white">إدارة الموارد البشرية (HR Operations)</div>
+                        <div class="text-xs text-slate-400">مراجعة المسمى والسلم الوظيفي واعتماد التوظيف</div>
+                    </div>
+                </div>
+                <div class="text-center text-slate-500 text-xs py-1"><i class="fas fa-arrow-down"></i></div>
+                <div class="flex items-center space-x-3 space-x-reverse text-sm py-2">
+                    <div class="w-8 h-8 rounded-full bg-emerald-600 text-white flex items-center justify-center font-bold text-xs">3</div>
+                    <div class="flex-1 bg-slate-800 p-3 rounded-lg border border-slate-700">
+                        <div class="font-semibold text-white">صاحب الصلاحية النهائية / المدير العام</div>
+                        <div class="text-xs text-slate-400">الموافقة والتأكيد النهائي لإصدار العرض الوظيفي</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function showLoading(show) {
+            document.getElementById('loadingIndicator').classList.toggle('hidden', !show);
+            const pendingSec = document.getElementById('pendingSection');
+            const icon = document.getElementById('refreshIcon');
+
+            if (show) {
+                pendingSec.classList.add('hidden');
+            } else {
+                pendingSec.classList.remove('hidden');
+            }
+
+            if (icon) icon.classList.toggle('fa-spin', show);
+        }
+    </script>
+</body>
+</html>

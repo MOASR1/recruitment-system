@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إدارة الأقسام - نظام الاعتمادات</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="app.js"></script>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col font-sans">
+
+    <!-- الشريط العلوي الموحد -->
+    <header class="bg-slate-800 border-b border-slate-700 px-6 py-4 flex justify-between items-center">
+        <div class="flex items-center space-x-4 space-x-reverse">
+            <i class="fas me-3 fa-building text-blue-500 text-2xl"></i>
+            <div>
+                <h1 class="text-xl font-bold">إدارة الأقسام والإدارات</h1>
+                <p class="text-xs text-slate-400">إضافة وتعديل الهيكل التنظيمي وربط الموظفين بالأقسام</p>
+            </div>
+        </div>
+        <div class="flex items-center space-x-3 space-x-reverse">
+            <a href="dashboard.html" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-sm transition">
+                <i class="fas fa-arrow-right ml-1"></i> العودة للوحة التحكم
+            </a>
+            <button onclick="App.logout()" class="px-4 py-2 bg-red-600/20 text-red-400 hover:bg-red-600/30 rounded-lg text-sm transition">
+                خروج <i class="fas fa-sign-out-alt mr-1"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- المحتوى الرئيسي -->
+    <main class="flex-1 p-6 max-w-7xl mx-auto w-full space-y-6">
+
+        <!-- الإحصائيات السريعة -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="bg-slate-800 border border-slate-700 p-5 rounded-xl flex items-center justify-between">
+                <div>
+                    <p class="text-xs text-slate-400">إجمالي الأقسام</p>
+                    <h3 class="text-2xl font-bold text-white mt-1" id="statDeptsCount">0</h3>
+                </div>
+                <div class="w-10 h-10 rounded-lg bg-blue-500/20 text-blue-400 flex items-center justify-center text-lg">
+                    <i class="fas fa-sitemap"></i>
+                </div>
+            </div>
+
+            <div class="bg-slate-800 border border-slate-700 p-5 rounded-xl flex items-center justify-between">
+                <div>
+                    <p class="text-xs text-slate-400">إجمالي الموظفين المسجلين</p>
+                    <h3 class="text-2xl font-bold text-white mt-1" id="statUsersCount">0</h3>
+                </div>
+                <div class="w-10 h-10 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-lg">
+                    <i class="fas fa-users"></i>
+                </div>
+            </div>
+
+            <div class="bg-slate-800 border border-slate-700 p-5 rounded-xl flex items-center justify-between">
+                <div>
+                    <p class="text-xs text-slate-400">حالة التزامن مع Google Sheets</p>
+                    <h3 class="text-sm font-bold text-emerald-400 mt-1"><i class="fas fa-circle text-xs text-emerald-500 ml-1"></i> متصل بحيادية</h3>
+                </div>
+                <div class="w-10 h-10 rounded-lg bg-purple-500/20 text-purple-400 flex items-center justify-center text-lg">
+                    <i class="fas fa-sync"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- الشاشات والقطع -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            
+            <!-- نموذج إضافة / تعديل قسم -->
+            <div class="bg-slate-800 border border-slate-700 p-6 rounded-xl h-fit">
+                <h3 id="formTitle" class="text-lg font-bold text-white mb-4 flex items-center">
+                    <i class="fas fa-plus-circle text-blue-500 ml-2"></i> إضافة قسم جديد
+                </h3>
+
+                <form id="deptForm" onsubmit="handleSaveDepartment(event)" class="space-y-4">
+                    <input type="hidden" id="deptId">
+
+                    <div>
+                        <label class="block text-xs text-slate-400 mb-1">اسم القسم / الإدارة *</label>
+                        <input type="text" id="deptName" required placeholder="مثال: التقنية والتطوير" class="w-full p-2.5 bg-slate-900 border border-slate-700 rounded-lg text-sm text-white focus:border-blue-500">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs text-slate-400 mb-1">رمز القسم (Code)</label>
+                        <input type="text" id="deptCode" placeholder="مثال: IT" class="w-full p-2.5 bg-slate-900 border border-slate-700 rounded-lg text-sm text-white focus:border-blue-500">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs text-slate-400 mb-1">مدير القسم المسند</label>
+                        <select id="deptManager" class="w-full p-2.5 bg-slate-900 border border-slate-700 rounded-lg text-sm text-slate-300">
+                            <!-- القائمة الديناميكية للمدراء -->
+                        </select>
+                    </div>
+
+                    <div class="flex items-center space-x-2 space-x-reverse pt-2">
+                        <button type="submit" id="saveDeptBtn" class="flex-1 py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-sm font-bold transition">
+                            <i class="fas fa-save ml-1"></i> حفظ القسم
+                        </button>
+                        <button type="button" onclick="resetDeptForm()" class="px-4 py-2.5 bg-slate-700 hover:bg-slate-600 rounded-lg text-sm">
+                            إلغاء
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- جدول عرض الأقسام والمستخدمين المسجلين فيه -->
+            <div class="lg:col-span-2 bg-slate-800 border border-slate-700 rounded-xl overflow-hidden shadow-lg">
+                <div class="p-4 border-b border-slate-700 flex justify-between items-center">
+                    <h3 class="text-md font-bold text-white">الأقسام الحالية الموثقة في Google Sheets</h3>
+                    <button onclick="loadDepartmentsData()" class="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 rounded-lg text-xs">
+                        <i class="fas fa-sync-alt ml-1" id="refreshIcon"></i> تحديث البيانات
+                    </button>
+                </div>
+
+                <div id="loadingIndicator" class="text-center py-12">
+                    <i class="fas fa-circle-notch fa-spin text-3xl text-blue-500 mb-2"></i>
+                    <p class="text-xs text-slate-400">جاري جلب الأقسام من Google Sheets...</p>
+                </div>
+
+                <div id="deptsTableContainer" class="hidden overflow-x-auto">
+                    <table class="w-full text-right text-sm">
+                        <thead class="bg-slate-900/60 text-slate-400 text-xs border-b border-slate-700">
+                            <tr>
+                                <th class="p-4">الرمز</th>
+                                <th class="p-4">اسم القسم</th>
+                                <th class="p-4">مدير القسم</th>
+                                <th class="p-4 text-center">عدد الموظفين</th>
+                                <th class="p-4 text-center">الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="deptsTableBody" class="divide-y divide-slate-700/50">
+                            <!-- البيانات الديناميكية -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- المنطق البرمجي -->
+    <script>
+        let allDepartments = [];
+        let allUsers = [];
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            const currentUser = App.requireAdmin();
+            if (!currentUser) return;
+
+            await loadDepartmentsData();
+        });
+
+        async function loadDepartmentsData() {
+            showLoading(true);
+            try {
+                const [departments, users] = await Promise.all([
+                    App.getDepartments(),
+                    App.getUsers()
+                ]);
+
+                allDepartments = departments;
+                allUsers = users;
+
+                document.getElementById('statDeptsCount').innerText = allDepartments.length;
+                document.getElementById('statUsersCount').innerText = allUsers.length;
+
+                populateManagerDropdown(allUsers);
+                renderDepartmentsTable(allDepartments, allUsers);
+            } catch (error) {
+                console.error("خطأ أثناء جلب الأقسام:", error);
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        function populateManagerDropdown(users) {
+            const select = document.getElementById('deptManager');
+            select.innerHTML = `<option value="">-- اختر مدير القسم --</option>` + 
+                users.map(u => `<option value="${u.name}">${u.name} (${u.title || u.dept || 'موظف'})</option>`).join('');
+        }
+
+        function renderDepartmentsTable(depts, users) {
+            const tbody = document.getElementById('deptsTableBody');
+            if (!depts || depts.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-slate-400">لا توجد أقسام مسجلة حالياً</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = depts.map(d => {
+                const count = users.filter(u => u.dept === d.name).length;
+                return `
+                    <tr class="hover:bg-slate-700/30 transition border-b border-slate-700/40">
+                        <td class="p-4 font-mono font-bold text-blue-400">${d.code || 'GEN'}</td>
+                        <td class="p-4 font-semibold text-white">${d.name}</td>
+                        <td class="p-4 text-slate-300">${d.manager || 'غير محدد'}</td>
+                        <td class="p-4 text-center">
+                            <span class="px-2.5 py-1 bg-blue-500/10 text-blue-400 rounded-full text-xs font-bold border border-blue-500/20">
+                                ${count} موظف
+                            </span>
+                        </td>
+                        <td class="p-4 text-center space-x-2 space-x-reverse">
+                            <button onclick="editDepartment(${d.id})" class="p-2 bg-blue-600/20 text-blue-400 hover:bg-blue-600/40 rounded-lg text-xs transition">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button onclick="deleteDepartment(${d.id})" class="p-2 bg-red-600/20 text-red-400 hover:bg-red-600/40 rounded-lg text-xs transition">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        async function handleSaveDepartment(e) {
+            e.preventDefault();
+            const btn = document.getElementById('saveDeptBtn');
+            btn.disabled = true;
+
+            const id = document.getElementById('deptId').value;
+            const deptData = {
+                id: id ? Number(id) : Date.now(),
+                name: document.getElementById('deptName').value.trim(),
+                code: document.getElementById('deptCode').value.trim(),
+                manager: document.getElementById('deptManager').value
+            };
+
+            let updatedDepts = [...allDepartments];
+            if (id) {
+                const idx = updatedDepts.findIndex(d => String(d.id) === String(id));
+                if (idx !== -1) updatedDepts[idx] = deptData;
+            } else {
+                updatedDepts.push(deptData);
+            }
+
+            const success = await App.saveDepartments(updatedDepts);
+            if (success) {
+                await App.appendLog('إدارة الأقسام', `تم ${id ? 'تعديل' : 'إضافة'} القسم (${deptData.name})`);
+                allDepartments = updatedDepts;
+                renderDepartmentsTable(allDepartments, allUsers);
+                resetDeptForm();
+            } else {
+                alert('تعذر حفظ بيانات القسم في Google Sheets.');
+            }
+
+            btn.disabled = false;
+        }
+
+        function editDepartment(id) {
+            const dept = allDepartments.find(d => String(d.id) === String(id));
+            if (!dept) return;
+
+            document.getElementById('formTitle').innerHTML = `<i class="fas fa-edit text-blue-500 ml-2"></i> تعديل القسم`;
+            document.getElementById('deptId').value = dept.id;
+            document.getElementById('deptName').value = dept.name || '';
+            document.getElementById('deptCode').value = dept.code || '';
+            document.getElementById('deptManager').value = dept.manager || '';
+        }
+
+        function resetDeptForm() {
+            document.getElementById('formTitle').innerHTML = `<i class="fas fa-plus-circle text-blue-500 ml-2"></i> إضافة قسم جديد`;
+            document.getElementById('deptForm').reset();
+            document.getElementById('deptId').value = '';
+        }
+
+        async function deleteDepartment(id) {
+            const dept = allDepartments.find(d => String(d.id) === String(id));
+            if (!dept) return;
+
+            if (confirm(`هل أنت تأكد من حذف القسم (${dept.name})؟`)) {
+                showLoading(true);
+                const updatedDepts = allDepartments.filter(d => String(d.id) !== String(id));
+                const success = await App.saveDepartments(updatedDepts);
+                if (success) {
+                    await App.appendLog('إدارة الأقسام', `تم حذف القسم (${dept.name})`);
+                    allDepartments = updatedDepts;
+                    renderDepartmentsTable(allDepartments, allUsers);
+                } else {
+                    alert('فشل الحذف من Google Sheets.');
+                }
+                showLoading(false);
+            }
+        }
+
+        function showLoading(show) {
+            document.getElementById('loadingIndicator').classList.toggle('hidden', !show);
+            document.getElementById('deptsTableContainer').classList.toggle('hidden', show);
+            const icon = document.getElementById('refreshIcon');
+            if (icon) icon.classList.toggle('fa-spin', show);
+        }
+    </script>
+</body>
+</html>

@@ -3,346 +3,397 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>إدارة المستخدمين والصلاحيات - نظام الاعتمادات</title>
+    <title>إدارة المستخدمين - نظام الاعتمادات</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script src="app.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <style> body { font-family: 'Tajawal', sans-serif; } </style>
 </head>
-<body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col md:flex-row">
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col font-sans">
 
-    <!-- القائمة الجانبية -->
-    <aside class="w-full md:w-64 bg-slate-900 text-slate-300 flex-shrink-0 flex flex-col justify-between">
-        <div>
-            <div class="p-6 border-b border-slate-800 flex items-center gap-3">
-                <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-lg">📋</div>
-                <div>
-                    <h1 class="font-bold text-white text-base leading-tight">نظام الاعتمادات</h1>
-                    <p class="text-[11px] text-slate-400">إدارة توظيف الموارد البشرية</p>
-                </div>
+    <!-- الشريط العلوي -->
+    <header class="bg-slate-800 border-b border-slate-700 px-6 py-4 flex justify-between items-center">
+        <div class="flex items-center space-x-4 space-x-reverse">
+            <i class="fas me-3 fa-users-cog text-blue-500 text-2xl"></i>
+            <div>
+                <h1 class="text-xl font-bold">إدارة المستخدمين والصلاحيات</h1>
+                <p class="text-xs text-slate-400">إضافة وتعديل بيانات الموظفين وتعيين الصلاحيات</p>
             </div>
-
-            <nav class="p-4 space-y-1 text-sm font-medium">
-                <a href="dashboard.html" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-800 text-slate-400 hover:text-slate-200 transition">
-                    <span>📊</span> لوحة التحكم والإحصائيات
-                </a>
-                <a href="all_requests.html" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-800 text-slate-400 hover:text-slate-200 transition">
-                    <span>📑</span> جميع طلبات التوظيف
-                </a>
-                <a href="departments.html" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-800 text-slate-400 hover:text-slate-200 transition">
-                    <span>🏢</span> إدارة الأقسام
-                </a>
-                <a href="users.html" class="flex items-center gap-3 px-4 py-3 rounded-xl bg-blue-600 text-white font-semibold transition">
-                    <span>👥</span> الصلاحيات والمستخدمين
-                </a>
-                <a href="approval_chains.html" class="admin-only hidden flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-800 text-slate-400 hover:text-slate-200 transition">
-                    <span>🔄</span> سلسلة الموافقات
-                </a>
-                <a href="activity_log.html" class="admin-only hidden flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-800 text-slate-400 hover:text-slate-200 transition">
-                    <span>📜</span> سجل العمليات والأمان
-                </a>
-            </nav>
         </div>
-
-        <div class="p-4 border-t border-slate-800 flex items-center justify-between">
-            <div class="flex items-center gap-3">
-                <div class="w-9 h-9 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center font-bold text-sm border border-blue-500/30" id="userAvatar">م</div>
-                <div class="text-xs">
-                    <p class="font-bold text-white" id="navUserName">جاري التحميل...</p>
-                    <p class="text-slate-400 text-[10px]" id="navUserRole">...</p>
-                </div>
-            </div>
-            <button onclick="logout()" title="تسجيل الخروج" class="text-slate-400 hover:text-red-400 text-sm">🚪</button>
+        <div class="flex items-center space-x-3 space-x-reverse">
+            <a href="dashboard.html" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-sm transition">
+                <i class="fas fa-arrow-right ml-1"></i> العودة للوحة التحكم
+            </a>
+            <button onclick="App.logout()" class="px-4 py-2 bg-red-600/20 text-red-400 hover:bg-red-600/30 rounded-lg text-sm transition">
+                خروج <i class="fas fa-sign-out-alt mr-1"></i>
+            </button>
         </div>
-    </aside>
+    </header>
 
     <!-- المحتوى الرئيسي -->
-    <main class="flex-1 p-6 md:p-8 overflow-y-auto">
-        <header class="flex justify-between items-center mb-6">
-            <div>
-                <h1 class="text-2xl font-bold text-slate-900">إدارة المستخدمين والصلاحيات</h1>
-                <p class="text-xs text-slate-500 mt-0.5">إضافة المستخدمين وتحديد أدوارهم وصلاحياتهم الإجرائية</p>
+    <main class="flex-1 p-6 max-w-7xl mx-auto w-full">
+
+        <!-- أشرطة التصفية والإجراءات -->
+        <div class="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
+            <div class="relative w-full sm:w-80">
+                <i class="fas fa-search absolute right-3 top-3 text-slate-400"></i>
+                <input type="text" id="searchInput" oninput="filterUsers()" placeholder="بحث بالاسم، البريد أو القسم..." 
+                       class="w-full pr-10 pl-4 py-2 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:border-blue-500 text-sm">
             </div>
-            <button onclick="openUserModal()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-xl text-xs font-bold shadow transition flex items-center gap-2">
-                <span>+</span> إضافة مستخدم جديد
-            </button>
-        </header>
+            
+            <div class="flex items-center space-x-3 space-x-reverse w-full sm:w-auto">
+                <button onclick="loadUsersData()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-lg text-sm flex items-center">
+                    <i class="fas fa-sync-alt ml-2 text-slate-400" id="refreshIcon"></i> تحديث البيانات
+                </button>
+                <button onclick="openUserModal()" class="px-5 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-medium text-sm transition flex items-center">
+                    <i class="fas fa-user-plus ml-2"></i> إضافة مستخدم جديد
+                </button>
+            </div>
+        </div>
+
+        <!-- مؤشر التحميل -->
+        <div id="loadingIndicator" class="text-center py-12">
+            <i class="fas fa-circle-notch fa-spin text-4xl text-blue-500 mb-3"></i>
+            <p class="text-slate-400 text-sm">جاري التزامن مع Google Sheets...</p>
+        </div>
 
         <!-- جدول المستخدمين -->
-        <section class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
+        <div id="usersTableContainer" class="hidden bg-slate-800 border border-slate-700 rounded-xl overflow-hidden shadow-lg">
             <div class="overflow-x-auto">
-                <table class="w-full text-right text-xs">
-                    <thead class="bg-slate-50 text-slate-600 border-b border-slate-200 font-bold">
+                <table class="w-full text-right text-sm">
+                    <thead class="bg-slate-900/60 text-slate-400 text-xs border-b border-slate-700">
                         <tr>
-                            <th class="p-4">الرقم الوظيفي</th>
-                            <th class="p-4">اسم الموظف</th>
+                            <th class="p-4">الموظف</th>
                             <th class="p-4">البريد الإلكتروني</th>
-                            <th class="p-4">القسم</th>
-                            <th class="p-4">الدور</th>
-                            <th class="p-4">الصلاحيات الإجرائية</th>
+                            <th class="p-4">القسم / الإدارة</th>
+                            <th class="p-4">المسمى / الدور</th>
+                            <th class="p-4">الصلاحيات</th>
                             <th class="p-4 text-center">الإجراءات</th>
                         </tr>
                     </thead>
-                    <tbody id="usersTableBody" class="divide-y divide-slate-100">
-                        <!-- تعبئة البيانات ديناميكياً -->
+                    <tbody id="usersTableBody" class="divide-y divide-slate-700/50">
+                        <!-- يتم ملء البيانات ديناميكياً -->
                     </tbody>
                 </table>
             </div>
-        </section>
+        </div>
+
     </main>
 
     <!-- نافذة إضافة / تعديل مستخدم (Modal) -->
-    <div id="userModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
-        <div class="bg-white rounded-2xl max-w-2xl w-full p-6 shadow-xl border border-slate-200 space-y-5 max-h-[90vh] overflow-y-auto">
-            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-                <h3 id="modalTitle" class="text-base font-bold text-slate-900">إضافة مستخدم جديد</h3>
-                <button onclick="closeUserModal()" class="text-slate-400 hover:text-slate-600 text-lg">✕</button>
+    <div id="userModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50 hidden">
+        <div class="bg-slate-800 border border-slate-700 rounded-2xl w-full max-w-2xl max-h-[90vh] flex flex-col shadow-2xl">
+            
+            <div class="p-5 border-b border-slate-700 flex justify-between items-center">
+                <h3 id="modalTitle" class="text-lg font-bold text-white">إضافة مستخدم جديد</h3>
+                <button onclick="closeUserModal()" class="text-slate-400 hover:text-white"><i class="fas fa-times text-xl"></i></button>
             </div>
 
-            <form id="userForm" onsubmit="saveUser(event)" class="space-y-4">
+            <form id="userForm" onsubmit="handleSaveUser(event)" class="p-6 overflow-y-auto space-y-4 flex-1">
                 <input type="hidden" id="userId">
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <!-- الرقم الوظيفي -->
                     <div>
-                        <label class="block text-xs font-bold text-slate-700 mb-1">الرقم الوظيفي *</label>
-                        <input type="text" id="userEmpId" required class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs focus:ring-2 focus:ring-blue-500 outline-none">
+                        <label class="block text-xs text-slate-400 mb-1">الاسم الكامل *</label>
+                        <input type="text" id="userName" required class="w-full p-2.5 bg-slate-900 border border-slate-700 rounded-lg focus:border-blue-500 text-sm">
                     </div>
-
-                    <!-- اسم الموظف -->
                     <div>
-                        <label class="block text-xs font-bold text-slate-700 mb-1">اسم الموظف *</label>
-                        <input type="text" id="userName" required class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs focus:ring-2 focus:ring-blue-500 outline-none">
+                        <label class="block text-xs text-slate-400 mb-1">البريد الإلكتروني *</label>
+                        <input type="email" id="userEmail" required class="w-full p-2.5 bg-slate-900 border border-slate-700 rounded-lg focus:border-blue-500 text-sm">
                     </div>
+                </div>
 
-                    <!-- البريد الإلكتروني -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-xs font-bold text-slate-700 mb-1">البريد الإلكتروني *</label>
-                        <input type="email" id="userEmail" required class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs focus:ring-2 focus:ring-blue-500 outline-none">
+                        <label class="block text-xs text-slate-400 mb-1">كلمة المرور *</label>
+                        <input type="text" id="userPassword" required class="w-full p-2.5 bg-slate-900 border border-slate-700 rounded-lg focus:border-blue-500 text-sm">
                     </div>
-
-                    <!-- القسم -->
                     <div>
-                        <label class="block text-xs font-bold text-slate-700 mb-1">القسم *</label>
-                        <select id="userDept" required class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs focus:ring-2 focus:ring-blue-500 outline-none">
-                            <!-- تعبئة ديناميكية -->
-                        </select>
-                    </div>
-
-                    <!-- الدور -->
-                    <div class="md:col-span-2">
-                        <label class="block text-xs font-bold text-slate-700 mb-1">الدور *</label>
-                        <select id="userRole" required class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs focus:ring-2 focus:ring-blue-500 outline-none">
-                            <option value="مستخدم">مستخدم</option>
-                            <option value="مدير قسم">مدير قسم</option>
+                        <label class="block text-xs text-slate-400 mb-1">القسم / الإدارة *</label>
+                        <select id="userDept" required class="w-full p-2.5 bg-slate-900 border border-slate-700 rounded-lg focus:border-blue-500 text-sm">
+                            <!-- يتم تغذيتها من الأقسام -->
                         </select>
                     </div>
                 </div>
 
-                <!-- الصلاحيات الإجرائية -->
-                <div class="pt-2">
-                    <label class="block text-xs font-bold text-slate-700 mb-2">الصلاحيات الإجرائية</label>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 bg-slate-50 p-4 rounded-xl border border-slate-200">
-                        <label class="flex items-center gap-2 text-xs text-slate-700 cursor-pointer">
-                            <input type="checkbox" value="create_request" class="permission-check rounded border-slate-300 text-blue-600 focus:ring-blue-500">
-                            <span>إنشاء طلب</span>
-                        </label>
-                        <label class="flex items-center gap-2 text-xs text-slate-700 cursor-pointer">
-                            <input type="checkbox" value="cancel_request" class="permission-check rounded border-slate-300 text-blue-600 focus:ring-blue-500">
-                            <span>إلغاء الطلب</span>
-                        </label>
-                        <label class="flex items-center gap-2 text-xs text-slate-700 cursor-pointer">
-                            <input type="checkbox" value="view_all_requests" class="permission-check rounded border-slate-300 text-blue-600 focus:ring-blue-500">
-                            <span>عرض الطلبات</span>
-                        </label>
-                        <label class="flex items-center gap-2 text-xs text-slate-700 cursor-pointer">
-                            <input type="checkbox" value="edit_requests" class="permission-check rounded border-slate-300 text-blue-600 focus:ring-blue-500">
-                            <span>تعديل الطلبات</span>
-                        </label>
-                        <label class="flex items-center gap-2 text-xs text-slate-700 cursor-pointer">
-                            <input type="checkbox" value="approve_request" class="permission-check rounded border-slate-300 text-blue-600 focus:ring-blue-500">
-                            <span>الموافقة على الطلب</span>
-                        </label>
-                        <label class="flex items-center gap-2 text-xs text-slate-700 cursor-pointer">
-                            <input type="checkbox" value="final_approval" class="permission-check rounded border-slate-300 text-blue-600 focus:ring-blue-500">
-                            <span>اعتماد التوظيف</span>
-                        </label>
-                        <label class="flex items-center gap-2 text-xs text-slate-700 cursor-pointer col-span-1 sm:col-span-2 pt-2 border-t border-slate-200 font-bold text-blue-900">
-                            <input type="checkbox" value="admin_access" class="permission-check rounded border-slate-300 text-blue-600 focus:ring-blue-500">
-                            <span>إدارة النظام (الأقسام، المستخدمين، السلاسل، والسجلات)</span>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs text-slate-400 mb-1">المسمى الوظيفي / الدور *</label>
+                        <input type="text" id="userTitle" required placeholder="مثال: مدير قسم، أخصائي توظيف" class="w-full p-2.5 bg-slate-900 border border-slate-700 rounded-lg focus:border-blue-500 text-sm">
+                    </div>
+                    <div class="flex items-center pt-5">
+                        <label class="inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="userIsAdmin" onchange="toggleAdminPerms(this.checked)" class="sr-only peer">
+                            <div class="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:right-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600 relative"></div>
+                            <span class="mr-3 text-sm font-medium text-slate-200">صلاحيات مدير النظام الكاملة</span>
                         </label>
                     </div>
                 </div>
 
-                <!-- أزرار الإجراءات -->
-                <div class="flex items-center justify-end gap-2 border-t border-slate-100 pt-3">
-                    <button type="button" onclick="closeUserModal()" class="px-4 py-2 text-xs font-bold text-slate-500 hover:bg-slate-100 rounded-xl">إلغاء</button>
-                    <button type="submit" class="px-4 py-2 text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-xl shadow transition">حفظ البيانات</button>
+                <!-- مصفوفة الصلاحيات -->
+                <div>
+                    <label class="block text-xs text-slate-400 mb-2">تخصيص الصلاحيات التفصيلية:</label>
+                    <div id="permissionsGrid" class="grid grid-cols-2 sm:grid-cols-3 gap-2 p-3 bg-slate-900/80 border border-slate-700 rounded-lg">
+                        <!-- قائمة الصلاحيات -->
+                    </div>
+                </div>
+
+                <div class="pt-4 border-t border-slate-700 flex justify-end space-x-3 space-x-reverse">
+                    <button type="button" onclick="closeUserModal()" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-sm">إلغاء</button>
+                    <button type="submit" id="saveBtn" class="px-6 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-medium text-sm">
+                        <i class="fas fa-save ml-1"></i> حفظ البيانات
+                    </button>
                 </div>
             </form>
         </div>
     </div>
 
+    <!-- المنطق البرمجي للصفحة -->
     <script>
-        const PERMISSION_LABELS = {
-            'create_request': 'إنشاء طلب',
-            'cancel_request': 'إلغاء الطلب',
-            'view_all_requests': 'عرض الطلبات',
-            'edit_requests': 'تعديل الطلبات',
-            'approve_request': 'الموافقة على الطلب',
-            'final_approval': 'اعتماد التوظيف',
-            'admin_access': 'إدارة النظام'
-        };
+        const ALL_PERMISSIONS = [
+            'إنشاء طلب',
+            'إلغاء الطلب',
+            'عرض الطلبات',
+            'التعديل على الطلب',
+            'الموافقة على الطلب',
+            'اعتماد التوظيف',
+            'إدارة المستخدمين',
+            'إدارة الأقسام',
+            'سلسلة الاعتمادات',
+            'سجلات الأمان'
+        ];
 
+        let allUsers = [];
         let currentUser = null;
 
-        function initPage() {
-            currentUser = App.requireAuth();
+        document.addEventListener('DOMContentLoaded', async () => {
+            // التحقق من صلاحيات الدخول للمدير
+            currentUser = App.requireAdmin();
             if (!currentUser) return;
 
-            App.applyAdminNavigation(currentUser);
+            renderPermissionsForm();
+            await loadUsersData();
+        });
 
-            document.getElementById('navUserName').innerText = currentUser.name;
-            document.getElementById('navUserRole').innerText = currentUser.role;
-            document.getElementById('userAvatar').innerText = currentUser.name.charAt(0);
+        // 1. جلب البيانات من قوقل شيت وتغذية القوائم
+        async function loadUsersData() {
+            showLoading(true);
+            try {
+                // جلب المستخدمين والأقسام بالتوازي
+                const [users, departments] = await Promise.all([
+                    App.getUsers(),
+                    App.getDepartments()
+                ]);
 
-            loadDepartmentsDropdown();
-            renderUsersTable();
+                allUsers = users;
+                populateDepartmentDropdown(departments);
+                renderUsersTable(allUsers);
+            } catch (error) {
+                console.error("خطأ أثناء جلب بيانات المستخدمين:", error);
+            } finally {
+                showLoading(false);
+            }
         }
 
-        function loadDepartmentsDropdown() {
-            const depts = App.readJson('app_departments', ["الموارد البشرية", "المالية", "تقنية المعلومات", "الإدارة العامة"]);
+        // 2. تعبئة قائمة الأقسام
+        function populateDepartmentDropdown(depts) {
             const select = document.getElementById('userDept');
-            select.innerHTML = depts.map(d => `<option value="${d}">${d}</option>`).join('');
+            select.innerHTML = depts.map(d => `<option value="${d.name}">${d.name}</option>`).join('');
         }
 
-        function getUsers() {
-            return App.readJson('app_users', []);
-        }
-
-        function renderUsersTable() {
-            const users = getUsers();
+        // 3. عرض جدول المستخدمين
+        function renderUsersTable(usersList) {
             const tbody = document.getElementById('usersTableBody');
-            
-            if (users.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" class="p-6 text-center text-slate-400">لا يوجد مستخدمون مسجلون حتى الآن.</td></tr>`;
+            if (!usersList || usersList.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-slate-400">لا يوجد مستخدمون مسجلون حالياً</td></tr>`;
                 return;
             }
 
-            tbody.innerHTML = users.map(user => {
-                const permsBadges = (user.permissions || []).map(p => 
-                    `<span class="bg-slate-100 text-slate-600 px-2 py-0.5 rounded text-[10px] ml-1 mb-1 inline-block">${PERMISSION_LABELS[p] || p}</span>`
-                ).join('');
-
-                const roleBadge = user.role === 'مدير قسم' 
-                    ? `<span class="bg-blue-50 text-blue-700 font-bold px-2.5 py-1 rounded-full text-[11px]">مدير قسم</span>`
-                    : `<span class="bg-slate-100 text-slate-600 px-2.5 py-1 rounded-full text-[11px]">مستخدم</span>`;
-
+            tbody.innerHTML = usersList.map(u => {
+                const isAdminUser = App.isAdmin(u);
+                const permsCount = Array.isArray(u.perms) ? u.perms.length : 0;
+                
                 return `
-                    <tr class="hover:bg-slate-50/80 transition">
-                        <td class="p-4 font-bold text-blue-600">${user.empId || '-'}</td>
-                        <td class="p-4 font-bold text-slate-900">${user.name}</td>
-                        <td class="p-4 text-slate-600">${user.email}</td>
-                        <td class="p-4 text-slate-600">${user.dept || '-'}</td>
-                        <td class="p-4">${roleBadge}</td>
-                        <td class="p-4">${permsBadges || '<span class="text-slate-300">-</span>'}</td>
-                        <td class="p-4 text-center">
-                            <div class="flex items-center justify-center gap-2">
-                                <button onclick="editUser('${user.id}')" class="text-blue-600 hover:text-blue-800 text-xs font-bold">تعديل</button>
-                                <button onclick="deleteUser('${user.id}')" class="text-rose-600 hover:text-rose-800 text-xs font-bold">حذف</button>
+                    <tr class="hover:bg-slate-700/30 transition border-b border-slate-700/40">
+                        <td class="p-4 font-medium flex items-center">
+                            <div class="w-9 h-9 rounded-full ${isAdminUser ? 'bg-amber-500/20 text-amber-400' : 'bg-blue-500/20 text-blue-400'} flex items-center justify-center text-sm font-bold ml-3">
+                                ${u.name ? u.name.charAt(0) : 'U'}
                             </div>
+                            <div>
+                                <div class="text-white font-semibold">${u.name || 'بدون اسم'}</div>
+                                <div class="text-xs text-slate-400">ID: ${u.id}</div>
+                            </div>
+                        </td>
+                        <td class="p-4 text-slate-300">${u.email}</td>
+                        <td class="p-4"><span class="px-2.5 py-1 bg-slate-700/80 rounded-md text-xs">${u.dept || 'غير محدد'}</span></td>
+                        <td class="p-4 font-medium text-slate-200">${u.title || u.role || '-'}</td>
+                        <td class="p-4">
+                            ${isAdminUser 
+                                ? `<span class="px-2.5 py-1 bg-amber-500/10 text-amber-400 border border-amber-500/30 rounded-full text-xs font-semibold">مدير النظام (شامل)</span>`
+                                : `<span class="px-2.5 py-1 bg-blue-500/10 text-blue-400 border border-blue-500/30 rounded-full text-xs">${permsCount} صلاحية/صلاحيات</span>`
+                            }
+                        </td>
+                        <td class="p-4 text-center space-x-2 space-x-reverse">
+                            <button onclick="editUser(${u.id})" class="p-2 bg-blue-600/20 text-blue-400 hover:bg-blue-600/40 rounded-lg text-xs transition">
+                                <i class="fas fa-edit"></i> تعديل
+                            </button>
+                            <button onclick="deleteUser(${u.id})" class="p-2 bg-red-600/20 text-red-400 hover:bg-red-600/40 rounded-lg text-xs transition">
+                                <i class="fas fa-trash-alt"></i> حذف
+                            </button>
                         </td>
                     </tr>
                 `;
             }).join('');
         }
 
-        function openUserModal() {
-            document.getElementById('userForm').reset();
-            document.getElementById('userId').value = '';
-            document.getElementById('modalTitle').textContent = 'إضافة مستخدم جديد';
+        // 4. بناء خيارات الصلاحيات في النموذج
+        function renderPermissionsForm() {
+            const grid = document.getElementById('permissionsGrid');
+            grid.innerHTML = ALL_PERMISSIONS.map((perm, idx) => `
+                <label class="flex items-center space-x-2 space-x-reverse text-xs text-slate-300 cursor-pointer">
+                    <input type="checkbox" value="${perm}" class="perm-checkbox rounded border-slate-700 text-blue-600 focus:ring-0">
+                    <span>${perm}</span>
+                </label>
+            `).join('');
+        }
+
+        // 5. تصفية المستخدمين
+        function filterUsers() {
+            const query = document.getElementById('searchInput').value.toLowerCase().trim();
+            const filtered = allUsers.filter(u => 
+                (u.name && u.name.toLowerCase().includes(query)) ||
+                (u.email && u.email.toLowerCase().includes(query)) ||
+                (u.dept && u.dept.toLowerCase().includes(query)) ||
+                (u.title && u.title.toLowerCase().includes(query))
+            );
+            renderUsersTable(filtered);
+        }
+
+        // 6. فتح Modal الإضافة والتعديل
+        function openUserModal(user = null) {
+            const form = document.getElementById('userForm');
+            form.reset();
+
+            if (user) {
+                document.getElementById('modalTitle').innerText = 'تعديل بيانات المستخدم';
+                document.getElementById('userId').value = user.id;
+                document.getElementById('userName').value = user.name || '';
+                document.getElementById('userEmail').value = user.email || '';
+                document.getElementById('userPassword').value = user.password || user.pass || '';
+                document.getElementById('userDept').value = user.dept || '';
+                document.getElementById('userTitle').value = user.title || user.role || '';
+
+                const isAdminUser = App.isAdmin(user);
+                document.getElementById('userIsAdmin').checked = isAdminUser;
+                toggleAdminPerms(isAdminUser);
+
+                // تحديد الصلاحيات المسجلة
+                document.querySelectorAll('.perm-checkbox').forEach(cb => {
+                    cb.checked = Array.isArray(user.perms) && user.perms.includes(cb.value);
+                });
+            } else {
+                document.getElementById('modalTitle').innerText = 'إضافة مستخدم جديد';
+                document.getElementById('userId').value = '';
+                toggleAdminPerms(false);
+            }
+
             document.getElementById('userModal').classList.remove('hidden');
-            document.getElementById('userModal').classList.add('flex');
+        }
+
+        function editUser(id) {
+            const user = allUsers.find(u => String(u.id) === String(id));
+            if (user) openUserModal(user);
         }
 
         function closeUserModal() {
             document.getElementById('userModal').classList.add('hidden');
-            document.getElementById('userModal').classList.remove('flex');
         }
 
-        function saveUser(event) {
-            event.preventDefault();
+        function toggleAdminPerms(isAdminChecked) {
+            document.querySelectorAll('.perm-checkbox').forEach(cb => {
+                cb.checked = isAdminChecked;
+                cb.disabled = isAdminChecked;
+            });
+        }
 
-            const userId = document.getElementById('userId').value;
-            const empId = document.getElementById('userEmpId').value.trim();
-            const name = document.getElementById('userName').value.trim();
-            const email = document.getElementById('userEmail').value.trim();
-            const dept = document.getElementById('userDept').value;
-            const role = document.getElementById('userRole').value;
+        // 7. حفظ المستخدم وتحديث Google Sheets
+        async function handleSaveUser(e) {
+            e.preventDefault();
+            const saveBtn = document.getElementById('saveBtn');
+            saveBtn.disabled = true;
+            saveBtn.innerHTML = `<i class="fas fa-spinner fa-spin ml-1"></i> جاري الحفظ...`;
 
-            const selectedPermissions = Array.from(document.querySelectorAll('.permission-check:checked'))
-                                            .map(cb => cb.value);
+            const id = document.getElementById('userId').value;
+            const isAdminChecked = document.getElementById('userIsAdmin').checked;
 
-            let users = getUsers();
-
-            if (userId) {
-                const index = users.findIndex(u => u.id === userId);
-                if (index !== -1) {
-                    users[index] = { id: userId, empId, name, email, dept, role, permissions: selectedPermissions };
-                }
+            // تجميع الصلاحيات المختارة
+            let selectedPerms = [];
+            if (isAdminChecked) {
+                selectedPerms = [...ALL_PERMISSIONS, 'مدير النظام'];
             } else {
-                const newUser = {
-                    id: 'USR-' + Date.now(),
-                    empId,
-                    name,
-                    email,
-                    dept,
-                    role,
-                    permissions: selectedPermissions
-                };
-                users.push(newUser);
+                document.querySelectorAll('.perm-checkbox:checked').forEach(cb => selectedPerms.push(cb.value));
             }
 
-            App.writeJson('app_users', users);
-            closeUserModal();
-            renderUsersTable();
+            const userData = {
+                id: id ? Number(id) : Date.now(),
+                name: document.getElementById('userName').value.trim(),
+                email: document.getElementById('userEmail').value.trim().toLowerCase(),
+                password: document.getElementById('userPassword').value.trim(),
+                pass: document.getElementById('userPassword').value.trim(),
+                dept: document.getElementById('userDept').value,
+                title: document.getElementById('userTitle').value.trim(),
+                role: document.getElementById('userTitle').value.trim(),
+                perms: selectedPerms
+            };
+
+            let updatedUsers = [...allUsers];
+            if (id) {
+                const index = updatedUsers.findIndex(u => String(u.id) === String(id));
+                if (index !== -1) updatedUsers[index] = userData;
+            } else {
+                updatedUsers.push(userData);
+            }
+
+            // إرسال البيانات المحدثة لقوقل شيت
+            const success = await App.saveUsers(updatedUsers);
+            if (success) {
+                await App.appendLog('إدارة المستخدمين', `تم ${id ? 'تعديل' : 'إضافة'} المستخدم (${userData.name})`);
+                allUsers = updatedUsers;
+                renderUsersTable(allUsers);
+                closeUserModal();
+            } else {
+                alert('حدث خطأ أثناء الحفظ في قوقل شيت. حاول مرة أخرى.');
+            }
+
+            saveBtn.disabled = false;
+            saveBtn.innerHTML = `<i class="fas fa-save ml-1"></i> حفظ البيانات`;
         }
 
-        function editUser(id) {
-            const users = getUsers();
-            const user = users.find(u => u.id === id);
+        // 8. حذف مستخدم
+        async function deleteUser(id) {
+            const user = allUsers.find(u => String(u.id) === String(id));
             if (!user) return;
 
-            document.getElementById('userId').value = user.id;
-            document.getElementById('userEmpId').value = user.empId || '';
-            document.getElementById('userName').value = user.name;
-            document.getElementById('userEmail').value = user.email;
-            document.getElementById('userDept').value = user.dept;
-            document.getElementById('userRole').value = user.role;
-
-            document.querySelectorAll('.permission-check').forEach(cb => {
-                cb.checked = (user.permissions || []).includes(cb.value);
-            });
-
-            document.getElementById('modalTitle').textContent = 'تعديل بيانات المستخدم';
-            document.getElementById('userModal').classList.remove('hidden');
-            document.getElementById('userModal').classList.add('flex');
+            if (confirm(`هل أنت تأكد من حذف المستخدم (${user.name}) نهائياً؟`)) {
+                const updatedUsers = allUsers.filter(u => String(u.id) !== String(id));
+                showLoading(true);
+                const success = await App.saveUsers(updatedUsers);
+                if (success) {
+                    await App.appendLog('إدارة المستخدمين', `تم حذف المستخدم (${user.name})`);
+                    allUsers = updatedUsers;
+                    renderUsersTable(allUsers);
+                } else {
+                    alert('تعذر حذف المستخدم من قوقل شيت.');
+                }
+                showLoading(false);
+            }
         }
 
-        function deleteUser(id) {
-            if (!confirm('هل أنت متأكد من رغبتك في حذف هذا المستخدم؟')) return;
-
-            let users = getUsers();
-            users = users.filter(u => u.id !== id);
-            App.writeJson('app_users', users);
-            renderUsersTable();
+        function showLoading(show) {
+            document.getElementById('loadingIndicator').classList.toggle('hidden', !show);
+            document.getElementById('usersTableContainer').classList.toggle('hidden', show);
+            const icon = document.getElementById('refreshIcon');
+            if (icon) icon.classList.toggle('fa-spin', show);
         }
-
-        function logout() {
-            App.logout();
-        }
-
-        window.onload = initPage;
     </script>
 </body>
 </html>

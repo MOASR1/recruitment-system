@@ -3,283 +3,662 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة التحكم - نظام الاعتمادات</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="app.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <style> body { font-family: 'Tajawal', sans-serif; } </style>
+    <title>لوحة التحكم | نظام إدارة العقود وشؤون الموظفين</title>
+    
+    <!-- الخطوط والأيقونات -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- مكتبة الرسوم البيانية Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        :root {
+            --primary-color: #1e40af;
+            --primary-hover: #1d4ed8;
+            --secondary-color: #0f172a;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #334155;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            
+            --status-success: #10b981;
+            --status-warning: #f59e0b;
+            --status-danger: #ef4444;
+            --status-info: #3b82f6;
+
+            --sidebar-width: 260px;
+            --header-height: 70px;
+            --radius: 12px;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Tajawal', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* --- الشريط الجانبي Sidebar --- */
+        aside.sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--secondary-color);
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            right: 0;
+            z-index: 100;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-header {
+            height: var(--header-height);
+            display: flex;
+            align-items: center;
+            padding: 0 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            gap: 12px;
+        }
+
+        .sidebar-header i {
+            font-size: 1.5rem;
+            color: #60a5fa;
+        }
+
+        .sidebar-header h2 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            padding: 1.5rem 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            flex: 1;
+        }
+
+        .menu-item a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            color: #94a3b8;
+            text-decoration: none;
+            border-radius: var(--radius);
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .menu-item a:hover, .menu-item.active a {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: #fff;
+        }
+
+        .menu-item.active a {
+            background-color: var(--primary-color);
+        }
+
+        .menu-item .badge {
+            margin-right: auto;
+            background-color: var(--status-danger);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+        }
+
+        /* --- المحتوى الرئيسي Main Content --- */
+        main.main-wrapper {
+            margin-right: var(--sidebar-width);
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+            transition: all 0.3s ease;
+        }
+
+        /* --- الشريط العلوي Header --- */
+        header.navbar {
+            height: var(--header-height);
+            background-color: var(--card-bg);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 90;
+        }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+            background-color: var(--bg-color);
+            padding: 8px 16px;
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+            width: 320px;
+            gap: 10px;
+        }
+
+        .search-box input {
+            border: none;
+            background: transparent;
+            outline: none;
+            width: 100%;
+            font-size: 0.9rem;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .icon-btn {
+            position: relative;
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 6px;
+        }
+
+        .icon-btn .dot {
+            position: absolute;
+            top: 4px;
+            left: 4px;
+            width: 8px;
+            height: 8px;
+            background-color: var(--status-danger);
+            border-radius: 50%;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            padding-right: 12px;
+            border-right: 1px solid var(--border-color);
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+        }
+
+        .user-info h4 {
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .user-info p {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        /* --- جسم الصفحة Content --- */
+        .content-container {
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        /* العنوان والإجراءات السريعة */
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .page-title h1 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: var(--secondary-color);
+        }
+
+        .page-title p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-top: 4px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 10px 18px;
+            border-radius: var(--radius);
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            border: none;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+        }
+
+        .btn-outline:hover {
+            background-color: #f1f5f9;
+        }
+
+        /* --- بطاقات المؤشرات (KPI Cards) --- */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .kpi-card {
+            background-color: var(--card-bg);
+            padding: 1.5rem;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .kpi-data h3 {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .kpi-data .number {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--secondary-color);
+            margin: 6px 0;
+        }
+
+        .kpi-data .trend {
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .trend.up { color: var(--status-success); }
+        .trend.warning { color: var(--status-warning); }
+        .trend.danger { color: var(--status-danger); }
+
+        .kpi-icon {
+            width: 52px;
+            height: 52px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+        }
+
+        .kpi-icon.blue { background-color: #dbeafe; color: #1e40af; }
+        .kpi-icon.green { background-color: #d1fae5; color: #065f46; }
+        .kpi-icon.orange { background-color: #fef3c7; color: #92400e; }
+        .kpi-icon.red { background-color: #fee2e2; color: #991b1b; }
+
+        /* --- قسم الرسوم البيانية Charts Section --- */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 1.5rem;
+        }
+
+        @media (max-width: 1024px) {
+            .charts-grid { grid-template-columns: 1fr; }
+        }
+
+        .chart-card {
+            background-color: var(--card-bg);
+            padding: 1.5rem;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .chart-header h3 {
+            font-size: 1.1rem;
+            color: var(--secondary-color);
+        }
+
+        /* --- قسم الجداول Table Section --- */
+        .table-card {
+            background-color: var(--card-bg);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+        }
+
+        .table-header {
+            padding: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .table-header h3 {
+            font-size: 1.1rem;
+            color: var(--secondary-color);
+        }
+
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: right;
+        }
+
+        th, td {
+            padding: 14px 20px;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 0.9rem;
+        }
+
+        th {
+            background-color: #f8fafc;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        tbody tr:hover {
+            background-color: #f1f5f9;
+        }
+
+        /* شارات الحالة Status Badges */
+        .badge-status {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .badge-active { background-color: #d1fae5; color: #065f46; }
+        .badge-warning { background-color: #fef3c7; color: #92400e; }
+        .badge-expired { background-color: #fee2e2; color: #991b1b; }
+
+        /* أزرار الإجراءات داخل الجدول */
+        .btn-icon-table {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 4px 8px;
+            font-size: 1rem;
+            border-radius: 4px;
+        }
+
+        .btn-icon-table:hover {
+            background-color: var(--border-color);
+            color: var(--primary-color);
+        }
+
+        /* Responsive Breakpoints */
+        @media (max-width: 768px) {
+            aside.sidebar { transform: translateX(100%); }
+            main.main-wrapper { margin-right: 0; }
+            .sidebar.open { transform: translateX(0); }
+            .search-box { display: none; }
+        }
+    </style>
 </head>
-<body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col md:flex-row">
+<body>
 
-    <!-- القائمة الجانبية -->
-    <aside class="w-full md:w-64 bg-slate-900 text-slate-300 flex-shrink-0 flex flex-col justify-between">
-        <div>
-            <div class="p-6 border-b border-slate-800 flex items-center gap-3">
-                <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-lg">📋</div>
-                <div>
-                    <h1 class="font-bold text-white text-base leading-tight">نظام الاعتمادات</h1>
-                    <p class="text-[11px] text-slate-400">إدارة توظيف الموارد البشرية</p>
-                </div>
-            </div>
-
-            <nav class="p-4 space-y-1 text-sm font-medium">
-                <a href="dashboard.html" class="flex items-center gap-3 px-4 py-3 rounded-xl bg-blue-600 text-white font-semibold transition">
-                    <span>📊</span> لوحة التحكم والإحصائيات
-                </a>
-                <a href="all_requests.html" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-800 text-slate-400 hover:text-slate-200 transition">
-                    <span>📑</span> جميع طلبات التوظيف
-                </a>
-                <a href="departments.html" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-800 text-slate-400 hover:text-slate-200 transition">
-                    <span>🏢</span> إدارة الأقسام
-                </a>
-                <a href="users.html" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-800 text-slate-400 hover:text-slate-200 transition">
-                    <span>👥</span> الصلاحيات والمستخدمين
-                </a>
-                <a href="approval_chains.html" class="admin-only hidden flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-800 text-slate-400 hover:text-slate-200 transition">
-                    <span>🔄</span> سلسلة الموافقات
-                </a>
-                <a href="activity_log.html" class="admin-only hidden flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-800 text-slate-400 hover:text-slate-200 transition">
-                    <span>📜</span> سجل العمليات والأمان
-                </a>
-            </nav>
+    <!-- 1. الشريط الجانبي Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <i class="fa-solid fa-file-signature"></i>
+            <h2>نظام ميثاق</h2>
         </div>
-
-        <div class="p-4 border-t border-slate-800 flex items-center justify-between">
-            <div class="flex items-center gap-3">
-                <div class="w-9 h-9 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center font-bold text-sm border border-blue-500/30" id="userAvatar">م</div>
-                <div class="text-xs">
-                    <p class="font-bold text-white" id="navUserName">جاري التحميل...</p>
-                    <p class="text-slate-400 text-[10px]" id="navUserRole">...</p>
-                </div>
-            </div>
-            <button onclick="logout()" title="تسجيل الخروج" class="text-slate-400 hover:text-red-400 text-sm">🚪</button>
-        </div>
+        
+        <ul class="sidebar-menu">
+            <li class="menu-item active" data-view="dashboard">
+                <a href="#"><i class="fa-solid fa-chart-pie"></i> <span>لوحة التحكم</span></a>
+            </li>
+            <li class="menu-item" data-view="contracts">
+                <a href="#"><i class="fa-solid fa-file-contract"></i> <span>إدارة العقود</span></a>
+            </li>
+            <li class="menu-item" data-view="employees">
+                <a href="#"><i class="fa-solid fa-users"></i> <span>قائمة الموظفين</span></a>
+            </li>
+            <li class="menu-item" data-view="alerts">
+                <a href="#">
+                    <i class="fa-solid fa-bell"></i> 
+                    <span>التنبيهات</span>
+                    <span class="badge" id="alert-badge-count">0</span>
+                </a>
+            </li>
+            <li class="menu-item" data-view="reports">
+                <a href="#"><i class="fa-solid fa-chart-column"></i> <span>التقارير</span></a>
+            </li>
+            <li class="menu-item" data-view="settings" style="margin-top: auto;">
+                <a href="#"><i class="fa-solid fa-gear"></i> <span>الإعدادات</span></a>
+            </li>
+        </ul>
     </aside>
 
-    <!-- المحتوى الرئيسي -->
-    <main class="flex-1 p-6 md:p-8 overflow-y-auto">
-        <header class="flex justify-between items-center mb-6">
-            <div>
-                <h1 class="text-2xl font-bold text-slate-900">نظرة عامة والإحصائيات</h1>
-                <p class="text-xs text-slate-500 mt-0.5">متابعة فورية لطلبات الاعتماد والأقسام</p>
-            </div>
-            <!-- زر فتح النافذة المنبثقة للطلب الجديد -->
-            <button onclick="openNewRequestModal()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-xl text-xs font-bold shadow transition flex items-center gap-2">
-                <span>+</span> تقديم طلب توظيف جديد
+    <!-- 2. منطقة المحتوى الرئيسي Main Wrapper -->
+    <main class="main-wrapper">
+        
+        <!-- الشريط العلوي Navbar -->
+        <header class="navbar">
+            <button class="icon-btn" id="toggle-sidebar" aria-label="تبديل القائمة">
+                <i class="fa-solid fa-bars"></i>
             </button>
+
+            <div class="search-box">
+                <i class="fa-solid fa-magnifying-glass" style="color: var(--text-muted);"></i>
+                <input type="text" id="global-search-input" placeholder="ابحث باسم الموظف، السجل، أو رقم العقد...">
+            </div>
+
+            <div class="header-actions">
+                <button class="icon-btn" id="btn-notifications" title="الإشعارات">
+                    <i class="fa-regular fa-bell"></i>
+                    <span class="dot"></span>
+                </button>
+                
+                <div class="user-profile" id="user-profile-menu">
+                    <div class="user-avatar" id="user-avatar-initials">م</div>
+                    <div class="user-info">
+                        <h4 id="user-name-display">محمد راجحي</h4>
+                        <p id="user-role-display">أخصائي عمليات HR</p>
+                    </div>
+                </div>
+            </div>
         </header>
 
-        <!-- كروت الإحصائيات -->
-        <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-            <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm">
-                <span class="text-xs text-slate-400 font-bold block mb-1">إجمالي الطلبات</span>
-                <span id="statTotal" class="text-2xl font-black text-slate-900">0</span>
-            </div>
-            <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm">
-                <span class="text-xs text-slate-400 font-bold block mb-1">قيد الاعتماد</span>
-                <span id="statPending" class="text-2xl font-black text-amber-600">0</span>
-            </div>
-            <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm">
-                <span class="text-xs text-slate-400 font-bold block mb-1">معتمدة نهائياً</span>
-                <span id="statApproved" class="text-2xl font-black text-emerald-600">0</span>
-            </div>
-            <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm">
-                <span class="text-xs text-slate-400 font-bold block mb-1">الأقسام المفعّلة</span>
-                <span id="statDepts" class="text-2xl font-black text-blue-600">0</span>
-            </div>
-        </section>
-    </main>
+        <!-- المحتوى الداخلي Dynamic Views Container -->
+        <div class="content-container" id="app-view-container">
 
-    <!-- نافذة تقديم طلب توظيف جديد -->
-    <div id="newRequestModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
-        <div class="bg-white rounded-2xl max-w-2xl w-full p-6 shadow-xl border border-slate-200 space-y-5 max-h-[90vh] overflow-y-auto">
-            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-                <div>
-                    <h3 class="text-base font-bold text-slate-900">تقديم طلب توظيف جديد</h3>
-                    <p class="text-[11px] text-slate-500">إدخال بيانات المرشح وإرسال الطلب للاعتماد</p>
+            <!-- هيدر الصفحة والعمليات السريعة -->
+            <div class="page-header">
+                <div class="page-title">
+                    <h1>نظرة عامة على العقود</h1>
+                    <p>ملخص حالة عقود العمل وتنبيهات التجديد الفورية</p>
                 </div>
-                <button onclick="closeNewRequestModal()" class="text-slate-400 hover:text-slate-600 text-lg">✕</button>
-            </div>
-
-            <form id="jobRequestForm" onsubmit="saveNewRequest(event)" class="space-y-4">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    
-                    <!-- 1. الرقم الوظيفي -->
-                    <div>
-                        <label class="block text-xs font-bold text-slate-700 mb-1">الرقم الوظيفي *</label>
-                        <input type="text" id="employeeId" required placeholder="مثال: 10042" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs text-slate-800 focus:ring-2 focus:ring-blue-500 focus:bg-white focus:outline-none transition">
-                    </div>
-
-                    <!-- 2. اسم المرشح -->
-                    <div>
-                        <label class="block text-xs font-bold text-slate-700 mb-1">اسم المرشح *</label>
-                        <input type="text" id="candidateName" required placeholder="مثال: محمد عبدالله" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs text-slate-800 focus:ring-2 focus:ring-blue-500 focus:bg-white focus:outline-none transition">
-                    </div>
-
-                    <!-- 3. المسمى الوظيفي -->
-                    <div>
-                        <label class="block text-xs font-bold text-slate-700 mb-1">المسمى الوظيفي *</label>
-                        <input type="text" id="jobTitle" required placeholder="مثال: أخصائي HR" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs text-slate-800 focus:ring-2 focus:ring-blue-500 focus:bg-white focus:outline-none transition">
-                    </div>
-
-                    <!-- 4. القسم أو الإدارة -->
-                    <div>
-                        <label class="block text-xs font-bold text-slate-700 mb-1">القسم أو الإدارة *</label>
-                        <select id="department" required class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs text-slate-800 focus:ring-2 focus:ring-blue-500 focus:bg-white focus:outline-none transition">
-                        </select>
-                    </div>
-
-                    <!-- 5. الراتب -->
-                    <div class="md:col-span-2">
-                        <label class="block text-xs font-bold text-slate-700 mb-1">الراتب (SAR) *</label>
-                        <input type="number" id="salary" required placeholder="مثال: 12000" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs text-slate-800 focus:ring-2 focus:ring-blue-500 focus:bg-white focus:outline-none transition">
-                    </div>
-
-                    <!-- 6. ملاحظات -->
-                    <div class="md:col-span-2">
-                        <label class="block text-xs font-bold text-slate-700 mb-1">ملاحظات</label>
-                        <textarea id="notes" rows="3" placeholder="أدخل أي ملاحظات إضافية بخصوص الطلب هنا..." class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs text-slate-800 focus:ring-2 focus:ring-blue-500 focus:bg-white focus:outline-none transition"></textarea>
-                    </div>
-
-                </div>
-
-                <!-- 7. قسم المرفقات -->
-                <div class="pt-2 border-t border-slate-200">
-                    <label class="block text-xs font-bold text-slate-700 mb-2">المرفقات المطلوبة *</label>
-                    <div class="border-2 border-dashed border-slate-300 rounded-2xl p-4 text-center hover:border-blue-500 transition-colors bg-slate-50/50">
-                        <input type="file" id="fileInput" multiple class="hidden" onchange="handleFiles(this.files)">
-                        <label for="fileInput" class="cursor-pointer">
-                            <p class="text-xs text-slate-600 font-bold">اضغط هنا لرفع الملفات أو قم بسحبها وإسقاطها</p>
-                            <p class="text-[11px] text-slate-400 mt-1">PDF, DOCX, PNG (الحجم الأقصى: 10MB)</p>
-                        </label>
-                    </div>
-                    <ul id="fileList" class="mt-3 space-y-2 text-xs text-slate-600"></ul>
-                </div>
-
-                <!-- أزرار الإجراءات -->
-                <div class="flex items-center justify-end gap-2 border-t border-slate-100 pt-3">
-                    <button type="button" onclick="closeNewRequestModal()" class="px-4 py-2 text-xs font-bold text-slate-500 hover:bg-slate-100 rounded-xl">إلغاء</button>
-                    <button type="submit" class="px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-md shadow-blue-500/20 transition">
-                        إرسال
+                <div class="action-buttons">
+                    <button class="btn btn-outline" id="btn-import-excel">
+                        <i class="fa-solid fa-file-import"></i> استيراد من منصة قوى
+                    </button>
+                    <button class="btn btn-primary" id="btn-add-contract">
+                        <i class="fa-solid fa-plus"></i> إضافة عقد جديد
                     </button>
                 </div>
-            </form>
+            </div>
+
+            <!-- بطاقات المؤشرات الرئيسية KPI Cards -->
+            <div class="kpi-grid">
+                <!-- إجمالي الموظفين والعقود -->
+                <div class="kpi-card">
+                    <div class="kpi-data">
+                        <h3>إجمالي العقود المسجلة</h3>
+                        <div class="number" id="kpi-total-contracts">0</div>
+                        <div class="trend up"><i class="fa-solid fa-arrow-up"></i> <span>مكتمل البيانات</span></div>
+                    </div>
+                    <div class="kpi-icon blue">
+                        <i class="fa-solid fa-users"></i>
+                    </div>
+                </div>
+
+                <!-- العقود النشطة -->
+                <div class="kpi-card">
+                    <div class="kpi-data">
+                        <h3>العقود السارية</h3>
+                        <div class="number" id="kpi-active-contracts">0</div>
+                        <div class="trend up"><i class="fa-solid fa-check"></i> <span>سارية المفعول</span></div>
+                    </div>
+                    <div class="kpi-icon green">
+                        <i class="fa-solid fa-file-circle-check"></i>
+                    </div>
+                </div>
+
+                <!-- عقود تنتهي قريباً (أقل من 60 يوم) -->
+                <div class="kpi-card">
+                    <div class="kpi-data">
+                        <h3>تنتهي خلال 60 يوماً</h3>
+                        <div class="number" id="kpi-expiring-soon">0</div>
+                        <div class="trend warning"><i class="fa-solid fa-triangle-exclamation"></i> <span>تتطلب إجراء</span></div>
+                    </div>
+                    <div class="kpi-icon orange">
+                        <i class="fa-solid fa-clock-rotate-left"></i>
+                    </div>
+                </div>
+
+                <!-- العقود المنتهية -->
+                <div class="kpi-card">
+                    <div class="kpi-data">
+                        <h3>العقود المنتهية</h3>
+                        <div class="number" id="kpi-expired-contracts">0</div>
+                        <div class="trend danger"><i class="fa-solid fa-xmark"></i> <span>بحاجة لتجديد/إنهاء</span></div>
+                    </div>
+                    <div class="kpi-icon red">
+                        <i class="fa-solid fa-file-circle-exclamation"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- قسم الرسوم البيانية Charts -->
+            <div class="charts-grid">
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3>معدل انتهاء العقود الأشهر القادمة</h3>
+                        <button class="btn-icon-table"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+                    </div>
+                    <canvas id="contractsTimelineChart" height="110"></canvas>
+                </div>
+
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3>توزيع العقود حسب الأقسام</h3>
+                    </div>
+                    <canvas id="departmentDistributionChart" height="220"></canvas>
+                </div>
+            </div>
+
+            <!-- جدول العقود الأكثر أهمية / القريبة من الانتهاء -->
+            <div class="table-card">
+                <div class="table-header">
+                    <h3>العقود التي تتطلب متابعة عاجلة</h3>
+                    <div class="action-buttons">
+                        <button class="btn btn-outline" id="btn-export-excel">
+                            <i class="fa-solid fa-file-excel"></i> تصدير Excel
+                        </button>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>اسم الموظف</th>
+                                <th>المسمى الوظيفي</th>
+                                <th>القسم</th>
+                                <th>تاريخ انتهاء العقد</th>
+                                <th>الأيام المتبقية</th>
+                                <th>الحالة</th>
+                                <th>الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="table-expiring-contracts-body">
+                            <!-- يتم ملء البيانات ديناميكياً بواسطة app.js -->
+                            <tr>
+                                <td colspan="7" style="text-align: center; color: var(--text-muted); padding: 2rem;">
+                                    جاري تحميل البيانات...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
         </div>
-    </div>
+    </main>
 
-    <script>
-        let currentUser = null;
-        let attachedFilesList = [];
-
-        function loadDashboard() {
-            currentUser = App.requireAuth();
-            if (!currentUser) return;
-
-            App.applyAdminNavigation(currentUser);
-
-            document.getElementById('navUserName').innerText = currentUser.name;
-            document.getElementById('navUserRole').innerText = currentUser.role;
-            document.getElementById('userAvatar').innerText = currentUser.name.charAt(0);
-
-            updateStats();
-        }
-
-        function updateStats() {
-            const requests = App.readJson('app_requests', []);
-            const depts = App.readJson('app_departments', []);
-
-            document.getElementById('statTotal').innerText = requests.length;
-            document.getElementById('statPending').innerText = requests.filter(r => r.status === 'pending').length;
-            document.getElementById('statApproved').innerText = requests.filter(r => r.status === 'approved').length;
-            document.getElementById('statDepts').innerText = depts.length;
-        }
-
-        function loadDepartmentsDropdown() {
-            const savedDepts = App.readJson('app_departments', ["الموارد البشرية", "الإدارة العليا", "المالية", "تقنية المعلومات"]);
-            const select = document.getElementById('department');
-            select.innerHTML = '<option value="" disabled selected>اختر القسم أو الإدارة</option>';
-            savedDepts.forEach(d => {
-                select.innerHTML += `<option value="${d}">${d}</option>`;
-            });
-        }
-
-        function handleFiles(files) {
-            const fileList = document.getElementById('fileList');
-            fileList.innerHTML = '';
-            attachedFilesList = [];
-
-            for (let i = 0; i < files.length; i++) {
-                attachedFilesList.push(files[i].name);
-                fileList.innerHTML += `
-                    <li class="flex items-center justify-between bg-blue-50/60 border border-blue-100 p-2.5 rounded-xl">
-                        <span class="font-semibold text-slate-700">📄 ${files[i].name}</span>
-                        <span class="text-[10px] bg-blue-600 text-white font-bold px-2 py-0.5 rounded-full">جاهز للرفع</span>
-                    </li>`;
-            }
-        }
-
-        function openNewRequestModal() {
-            document.getElementById('jobRequestForm').reset();
-            document.getElementById('fileList').innerHTML = '';
-            attachedFilesList = [];
-            loadDepartmentsDropdown();
-            document.getElementById('newRequestModal').classList.remove('hidden');
-            document.getElementById('newRequestModal').classList.add('flex');
-        }
-
-        function closeNewRequestModal() {
-            document.getElementById('newRequestModal').classList.add('hidden');
-            document.getElementById('newRequestModal').classList.remove('flex');
-        }
-
-        function saveNewRequest(event) {
-            event.preventDefault();
-
-            const employeeId = document.getElementById('employeeId').value.trim();
-            const candidateName = document.getElementById('candidateName').value.trim();
-            const jobTitle = document.getElementById('jobTitle').value.trim();
-            const dept = document.getElementById('department').value;
-            const salary = Number(document.getElementById('salary').value);
-            const notes = document.getElementById('notes').value.trim();
-
-            const newReq = {
-                id: `REQ-${new Date().getFullYear()}-${String(Date.now()).slice(-5)}`,
-                employeeId,
-                candidateName,
-                jobTitle,
-                dept,
-                salary,
-                notes,
-                attachments: attachedFilesList,
-                creatorId: currentUser.id || 'SYS',
-                creatorName: currentUser.name || 'مستخدم',
-                createdAt: new Date().toLocaleDateString('ar-SA'),
-                status: 'pending',
-                currentStepIndex: 0
-            };
-
-            let requests = App.readJson('app_requests', []);
-            requests.unshift(newReq);
-            App.writeJson('app_requests', requests);
-
-            let logs = App.readJson('app_logs', []);
-            logs.unshift({
-                user: currentUser.name,
-                action: 'إنشاء طلب جديد',
-                details: `تم تقديم طلب للمرشح: ${newReq.candidateName} (رقم الطلب: ${newReq.id})`,
-                timestamp: new Date().toLocaleString('ar-SA')
-            });
-            App.writeJson('app_logs', logs);
-
-            closeNewRequestModal();
-            updateStats();
-        }
-
-        function logout() {
-            App.logout();
-        }
-
-        window.onload = loadDashboard;
-    </script>
+    <!-- النص البرمجي الرئيسي app.js -->
+    <script src="app.js"></script>
 </body>
 </html>

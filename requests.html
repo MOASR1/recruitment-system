@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إدارة طلبات التوظيف - نظام الاعتمادات</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="app.js"></script>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col font-sans">
+
+    <!-- الشريط العلوي -->
+    <header class="bg-slate-800 border-b border-slate-700 px-6 py-4 flex justify-between items-center">
+        <div class="flex items-center space-x-4 space-x-reverse">
+            <i class="fas me-3 fa-file-signature text-blue-500 text-2xl"></i>
+            <div>
+                <h1 class="text-xl font-bold">إدارة طلبات التوظيف</h1>
+                <p class="text-xs text-slate-400">إنشاء ومتابعة وإدارة طلبات التوظيف والاعتمادات</p>
+            </div>
+        </div>
+        <div class="flex items-center space-x-3 space-x-reverse">
+            <a href="dashboard.html" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-sm transition">
+                <i class="fas fa-arrow-right ml-1"></i> العودة للوحة التحكم
+            </a>
+            <button onclick="App.logout()" class="px-4 py-2 bg-red-600/20 text-red-400 hover:bg-red-600/30 rounded-lg text-sm transition">
+                خروج <i class="fas fa-sign-out-alt mr-1"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- المحتوى الرئيسي -->
+    <main class="flex-1 p-6 max-w-7xl mx-auto w-full">
+
+        <!-- أشرطة التصفية والإجراءات -->
+        <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+            <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto flex-1 max-w-2xl">
+                <!-- حقل البحث -->
+                <div class="relative w-full">
+                    <i class="fas fa-search absolute right-3 top-3 text-slate-400"></i>
+                    <input type="text" id="searchInput" oninput="filterRequests()" placeholder="بحث بالمسمى، المرشح، القسم أو الرقم..." 
+                           class="w-full pr-10 pl-4 py-2 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:border-blue-500 text-sm">
+                </div>
+                <!-- فلتر الحالة -->
+                <select id="statusFilter" onchange="filterRequests()" class="px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg text-sm focus:outline-none focus:border-blue-500 text-slate-300">
+                    <option value="ALL">جميع الحالات</option>
+                    <option value="قيد الانتظار">قيد الانتظار</option>
+                    <option value="مكتمل">مكتمل (معتمد)</option>
+                    <option value="مرفوض">مرفوض</option>
+                    <option value="مسودة">مسودة</option>
+                </select>
+            </div>
+            
+            <div class="flex items-center space-x-3 space-x-reverse w-full md:w-auto">
+                <button onclick="loadRequestsData()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-lg text-sm flex items-center">
+                    <i class="fas fa-sync-alt ml-2 text-slate-400" id="refreshIcon"></i> تحديث البيانات
+                </button>
+                <button onclick="openRequestModal()" class="px-5 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-medium text-sm transition flex items-center">
+                    <i class="fas fa-plus ml-2"></i> إنشاء طلب جديد
+                </button>
+            </div>
+        </div>
+
+        <!-- مؤشر التحميل -->
+        <div id="loadingIndicator" class="text-center py-12">
+            <i class="fas fa-circle-notch fa-spin text-4xl text-blue-500 mb-3"></i>
+            <p class="text-slate-400 text-sm">جاري جلب الطلبات من Google Sheets...</p>
+        </div>
+
+        <!-- جدول الطلبات -->
+        <div id="requestsTableContainer" class="hidden bg-slate-800 border border-slate-700 rounded-xl overflow-hidden shadow-lg">
+            <div class="overflow-x-auto">
+                <table class="w-full text-right text-sm">
+                    <thead class="bg-slate-900/60 text-slate-400 text-xs border-b border-slate-700">
+                        <tr>
+                            <th class="p-4">رقم الطلب / التاريخ</th>
+                            <th class="p-4">المسمى الوظيفي / القسم</th>
+                            <th class="p-4">المرشح / الراتب المتوقع</th>
+                            <th class="p-4">الأولوية</th>
+                            <th class="p-4">حالة الطلب</th>
+                            <th class="p-4 text-center">الإجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody id="requestsTableBody" class="divide-y divide-slate-700/50">
+                        <!-- يتم ملء البيانات ديناميكياً -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- نافذة إضافة / تعديل طلب توظيف (Modal) -->
+    <div id="requestModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50 hidden">
+        <div class="bg-slate-800 border border-slate-700 rounded-2xl w-full max-w-3xl max-h-[90vh] flex flex-col shadow-2xl">
+            
+            <div class="p-5 border-b border-slate-700 flex justify-between items-center">
+                <h3 id="modalTitle" class="text-lg font-bold text-white">إنشاء طلب توظيف جديد</h3>
+                <button onclick="closeRequestModal()" class="text-slate-400 hover:text-white"><i class="fas fa-times text-xl"></i></button>
+            </div>
+
+            <form id="requestForm" onsubmit="handleSaveRequest(event)" class="p-6 overflow-y-auto space-y-4 flex-1">
+                <input type="hidden" id="requestId">
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs text-slate-400 mb-1">المسمى الوظيفي المطلوب *</label>
+                        <input type="text" id="jobTitle" required placeholder="مثال: أخصائي موارد بشرية" class="w-full p-2.5 bg-slate-900 border border-slate-700 rounded-lg focus:border-blue-500 text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-slate-400 mb-1">القسم / الإدارة *</label>
+                        <select id="requestDept" required class="w-full p-2.5 bg-slate-900 border border-slate-700 rounded-lg focus:border-blue-500 text-sm">
+                            <!-- يتم تعبئتها من الأقسام -->
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-xs text-slate-400 mb-1">اسم المرشح (إن وجد)</label>
+                        <input type="text" id="candidateName" placeholder="الاسم الكامل" class="w-full p-2.5 bg-slate-900 border border-slate-700 rounded-lg focus:border-blue-500 text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-slate-400 mb-1">الراتب المتوقع (SAR)</label>
+                        <input type="number" id="proposedSalary" placeholder="مثال: 12000" class="w-full p-2.5 bg-slate-900 border border-slate-700 rounded-lg focus:border-blue-500 text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-slate-400 mb-1">عدد الشاغر *</label>
+                        <input type="number" id="vacanciesCount" value="1" min="1" required class="w-full p-2.5 bg-slate-900 border border-slate-700 rounded-lg focus:border-blue-500 text-sm">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs text-slate-400 mb-1">درجة الأولوية *</label>
+                        <select id="priorityLevel" required class="w-full p-2.5 bg-slate-900 border border-slate-700 rounded-lg focus:border-blue-500 text-sm">
+                            <option value="عادية">عادية</option>
+                            <option value="متوسطة">متوسطة</option>
+                            <option value="عاجلة">عاجلة جداً</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs text-slate-400 mb-1">نوع العقد</label>
+                        <select id="employmentType" class="w-full p-2.5 bg-slate-900 border border-slate-700 rounded-lg focus:border-blue-500 text-sm">
+                            <option value="دوام كامل">دوام كامل</option>
+                            <option value="دوام جزئي">دوام جزئي</option>
+                            <option value="عقد مؤقت">عقد مؤقت</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs text-slate-400 mb-1">مبررات التوظيف / المهام الوظيفية *</label>
+                    <textarea id="requestNotes" rows="3" required placeholder="اذكر أسباب الاحتياج للتوظيف والمهام الرئيسية..." class="w-full p-2.5 bg-slate-900 border border-slate-700 rounded-lg focus:border-blue-500 text-sm"></textarea>
+                </div>
+
+                <div class="pt-4 border-t border-slate-700 flex justify-end space-x-3 space-x-reverse">
+                    <button type="button" onclick="closeRequestModal()" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-sm">إلغاء</button>
+                    <button type="submit" id="saveReqBtn" class="px-6 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-medium text-sm">
+                        <i class="fas fa-paper-plane ml-1"></i> تقديم الطلب
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- المنطق البرمجي للكتلة -->
+    <script>
+        let allRequests = [];
+        let currentUser = null;
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            currentUser = App.getCurrentUser();
+            if (!currentUser) {
+                window.location.href = 'index.html';
+                return;
+            }
+
+            await loadRequestsData();
+        });
+
+        // 1. جلب البيانات وتغذية القوائم
+        async function loadRequestsData() {
+            showLoading(true);
+            try {
+                const [requests, departments] = await Promise.all([
+                    App.getRequests(),
+                    App.getDepartments()
+                ]);
+
+                allRequests = requests;
+                populateDepartmentDropdown(departments);
+                renderRequestsTable(allRequests);
+            } catch (error) {
+                console.error("خطأ أثناء جلب الطلبات:", error);
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // 2. تغذية قائمة الأقسام
+        function populateDepartmentDropdown(depts) {
+            const select = document.getElementById('requestDept');
+            select.innerHTML = depts.map(d => `<option value="${d.name}">${d.name}</option>`).join('');
+        }
+
+        // 3. عرض جدول الطلبات
+        function renderRequestsTable(requestsList) {
+            const tbody = document.getElementById('requestsTableBody');
+            if (!requestsList || requestsList.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-slate-400">لا توجد طلبات توظيف مسجلة</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = requestsList.map(r => {
+                const statusBadge = getStatusBadge(r.status);
+                const priorityBadge = getPriorityBadge(r.priority);
+                const reqDate = r.createdAt ? new Date(r.createdAt).toLocaleDateString('ar-SA') : 'اليوم';
+
+                return `
+                    <tr class="hover:bg-slate-700/30 transition border-b border-slate-700/40">
+                        <td class="p-4">
+                            <div class="font-bold text-blue-400">REQ-${r.id}</div>
+                            <div class="text-xs text-slate-400">${reqDate}</div>
+                        </td>
+                        <td class="p-4">
+                            <div class="text-white font-semibold">${r.title || r.jobTitle || 'بدون عنوان'}</div>
+                            <div class="text-xs text-slate-400"><i class="fas fa-building ml-1"></i>${r.dept || 'عام'}</div>
+                        </td>
+                        <td class="p-4">
+                            <div class="text-slate-200">${r.candidate || r.candidateName || 'لم يحدد بعد'}</div>
+                            <div class="text-xs text-slate-400">${r.salary ? Number(r.salary).toLocaleString() + ' SAR' : '-'}</div>
+                        </td>
+                        <td class="p-4">${priorityBadge}</td>
+                        <td class="p-4">${statusBadge}</td>
+                        <td class="p-4 text-center space-x-2 space-x-reverse">
+                            <button onclick="editRequest('${r.id}')" class="p-2 bg-blue-600/20 text-blue-400 hover:bg-blue-600/40 rounded-lg text-xs transition" title="تعديل">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button onclick="deleteRequest('${r.id}')" class="p-2 bg-red-600/20 text-red-400 hover:bg-red-600/40 rounded-lg text-xs transition" title="حذف">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // 4. تصفية الطلبات حسب البحث والحالة
+        function filterRequests() {
+            const query = document.getElementById('searchInput').value.toLowerCase().trim();
+            const status = document.getElementById('statusFilter').value;
+
+            const filtered = allRequests.filter(r => {
+                const matchesSearch = 
+                    (r.id && String(r.id).toLowerCase().includes(query)) ||
+                    (r.title && r.title.toLowerCase().includes(query)) ||
+                    (r.candidate && r.candidate.toLowerCase().includes(query)) ||
+                    (r.dept && r.dept.toLowerCase().includes(query));
+
+                const matchesStatus = (status === 'ALL') || (r.status === status);
+
+                return matchesSearch && matchesStatus;
+            });
+
+            renderRequestsTable(filtered);
+        }
+
+        // 5. فتح وغلق النافذة المنبثقة
+        function openRequestModal(req = null) {
+            const form = document.getElementById('requestForm');
+            form.reset();
+
+            if (req) {
+                document.getElementById('modalTitle').innerText = 'تعديل طلب التوظيف';
+                document.getElementById('requestId').value = req.id;
+                document.getElementById('jobTitle').value = req.title || req.jobTitle || '';
+                document.getElementById('requestDept').value = req.dept || '';
+                document.getElementById('candidateName').value = req.candidate || req.candidateName || '';
+                document.getElementById('proposedSalary').value = req.salary || '';
+                document.getElementById('vacanciesCount').value = req.vacancies || 1;
+                document.getElementById('priorityLevel').value = req.priority || 'عادية';
+                document.getElementById('employmentType').value = req.type || 'دوام كامل';
+                document.getElementById('requestNotes').value = req.notes || '';
+            } else {
+                document.getElementById('modalTitle').innerText = 'إنشاء طلب توظيف جديد';
+                document.getElementById('requestId').value = '';
+            }
+
+            document.getElementById('requestModal').classList.remove('hidden');
+        }
+
+        function editRequest(id) {
+            const req = allRequests.find(r => String(r.id) === String(id));
+            if (req) openRequestModal(req);
+        }
+
+        function closeRequestModal() {
+            document.getElementById('requestModal').classList.add('hidden');
+        }
+
+        // 6. حفظ الطلب في قوقل شيت
+        async function handleSaveRequest(e) {
+            e.preventDefault();
+            const saveBtn = document.getElementById('saveReqBtn');
+            saveBtn.disabled = true;
+            saveBtn.innerHTML = `<i class="fas fa-spinner fa-spin ml-1"></i> جاري الحفظ...`;
+
+            const id = document.getElementById('requestId').value;
+
+            const reqData = {
+                id: id ? id : 'REQ-' + Math.floor(1000 + Math.random() * 9000),
+                title: document.getElementById('jobTitle').value.trim(),
+                dept: document.getElementById('requestDept').value,
+                candidate: document.getElementById('candidateName').value.trim(),
+                salary: document.getElementById('proposedSalary').value,
+                vacancies: document.getElementById('vacanciesCount').value,
+                priority: document.getElementById('priorityLevel').value,
+                type: document.getElementById('employmentType').value,
+                notes: document.getElementById('requestNotes').value.trim(),
+                status: 'قيد الانتظار',
+                createdBy: currentUser.name || currentUser.email,
+                createdAt: new Date().toISOString()
+            };
+
+            let updatedRequests = [...allRequests];
+            if (id) {
+                const index = updatedRequests.findIndex(r => String(r.id) === String(id));
+                if (index !== -1) updatedRequests[index] = { ...updatedRequests[index], ...reqData };
+            } else {
+                updatedRequests.unshift(reqData);
+            }
+
+            const success = await App.saveRequests(updatedRequests);
+            if (success) {
+                await App.appendLog('إدارة الطلبات', `تم ${id ? 'تعديل' : 'إنشاء'} طلب توظيف (${reqData.title}) برقم (${reqData.id})`);
+                allRequests = updatedRequests;
+                renderRequestsTable(allRequests);
+                closeRequestModal();
+            } else {
+                alert('حدث خطأ أثناء حفظ الطلب في Google Sheets.');
+            }
+
+            saveBtn.disabled = false;
+            saveBtn.innerHTML = `<i class="fas fa-paper-plane ml-1"></i> تقديم الطلب`;
+        }
+
+        // 7. حذف الطلب
+        async function deleteRequest(id) {
+            const req = allRequests.find(r => String(r.id) === String(id));
+            if (!req) return;
+
+            if (confirm(`هل أنت تأكد من حذف الطلب رقم (${req.id})؟`)) {
+                showLoading(true);
+                const updatedRequests = allRequests.filter(r => String(r.id) !== String(id));
+                const success = await App.saveRequests(updatedRequests);
+                if (success) {
+                    await App.appendLog('إدارة الطلبات', `تم حذف طلب التوظيف رقم (${req.id})`);
+                    allRequests = updatedRequests;
+                    renderRequestsTable(allRequests);
+                } else {
+                    alert('تعذر حذف الطلب من Google Sheets.');
+                }
+                showLoading(false);
+            }
+        }
+
+        // الشارات التجميلية
+        function getStatusBadge(status) {
+            switch (status) {
+                case 'مكتمل':
+                case 'معتمد':
+                    return `<span class="px-2.5 py-1 bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 rounded-full text-xs font-semibold">مكتمل</span>`;
+                case 'مرفوض':
+                    return `<span class="px-2.5 py-1 bg-red-500/10 text-red-400 border border-red-500/30 rounded-full text-xs font-semibold">مرفوض</span>`;
+                case 'مسودة':
+                    return `<span class="px-2.5 py-1 bg-slate-500/10 text-slate-400 border border-slate-500/30 rounded-full text-xs">مسودة</span>`;
+                default:
+                    return `<span class="px-2.5 py-1 bg-amber-500/10 text-amber-400 border border-amber-500/30 rounded-full text-xs font-semibold">قيد الانتظار</span>`;
+            }
+        }
+
+        function getPriorityBadge(priority) {
+            switch (priority) {
+                case 'عاجلة جداً':
+                case 'عاجلة':
+                    return `<span class="px-2 py-0.5 bg-red-500/20 text-red-400 rounded text-xs font-medium">عاجل</span>`;
+                case 'متوسطة':
+                    return `<span class="px-2 py-0.5 bg-amber-500/20 text-amber-400 rounded text-xs font-medium">متوسط</span>`;
+                default:
+                    return `<span class="px-2 py-0.5 bg-slate-700 text-slate-300 rounded text-xs">عادي</span>`;
+            }
+        }
+
+        function showLoading(show) {
+            document.getElementById('loadingIndicator').classList.toggle('hidden', !show);
+            document.getElementById('requestsTableContainer').classList.toggle('hidden', show);
+            const icon = document.getElementById('refreshIcon');
+            if (icon) icon.classList.toggle('fa-spin', show);
+        }
+    </script>
+</body>
+</html>
